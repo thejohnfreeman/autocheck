@@ -72,8 +72,12 @@ namespace autocheck {
       T* operator-> ()             { return ptr(); }
       const T* operator-> () const { return ptr(); }
 
-      operator T& ()             { return *ptr(); }
-      operator const T& () const { return *ptr(); }
+      T& ref()              { return *ptr(); }
+      const T& ref()  const { return *ptr(); }
+      const T& cref() const { return *ptr(); }
+
+      operator T& ()             { return ref(); }
+      operator const T& () const { return cref(); }
 
       void clear() {
         if (allocation == Heap) {

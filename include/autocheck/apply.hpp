@@ -9,6 +9,12 @@ namespace autocheck {
   template <int... Is>
   struct range<0, Is...> {};
 
+  template <typename F, typename Arg>
+  typename std::result_of<F(Arg)>::type
+  apply(F f, const Arg& arg) {
+    return f(arg);
+  }
+
   template <typename F, typename... Args>
   typename std::result_of<F(Args...)>::type
   apply(F f, const std::tuple<Args...>& args) {

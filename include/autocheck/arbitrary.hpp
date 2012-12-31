@@ -8,6 +8,7 @@
 #include "is_one_of.hpp"
 #include "value.hpp"
 #include "predicate.hpp"
+#include "apply.hpp"
 
 namespace autocheck {
 
@@ -22,9 +23,47 @@ namespace autocheck {
 
   namespace detail {
 
+    template <typename... Bases>
+    class tuple_generator {
+      private:
+        std::tuple<Bases...> bases;
+
+      public:
+        typedef std::tuple<typename Bases::result_type...> result_type;
+
+        tuple_generator() :
+          bases(Bases()...) {}
+
+        tuple_generator(const Bases&... bases) :
+          bases(bases...) {}
+
+        template <int... Is>
+        result_type generate(size_t size, const range<0, Is...>&) {
+          return result_type(std::get<Is>(bases)(size)...);
+        }
+
+        result_type operator() (size_t size) {
+          return generate(size, range<sizeof...(Bases)>());
+        }
+    };
+
     /* Base generators for arbitrary. */
     template <typename T, typename Enable = void>
     class generator;
+
+    template <typename... Args>
+    class generator<std::tuple<Args...>> :
+      public tuple_generator<generator<Args>...>
+    {
+      private:
+        typedef tuple_generator<generator<Args>...> base_t;
+
+      public:
+        generator() : base_t() {}
+
+        generator(const generator<Args>&... bases) :
+          base_t(bases...) {}
+    };
 
     template <>
     class generator<bool> {

@@ -1,23 +1,24 @@
 #ifndef AUTOCHECK_REPORTER_HPP
 #define AUTOCHECK_REPORTER_HPP
 
-#include <ostream>
+#include <iostream>
 
 namespace autocheck {
 
   class reporter {
     public:
-      virtual void success(size_t tests, size_t max_tests) = 0;
-      virtual void failure(size_t tests, const char* reason) = 0;
+      virtual void success(size_t tests, size_t max_tests) const = 0;
+      virtual void failure(size_t tests, const char* reason) const = 0;
   };
 
   class ostream_reporter : public reporter {
     private:
       std::ostream& out;
-    public:
-      ostream_reporter(std::ostream& out) : out(out) {}
 
-      virtual void success(size_t tests, size_t max_tests) {
+    public:
+      ostream_reporter(std::ostream& out = std::cout) : out(out) {}
+
+      virtual void success(size_t tests, size_t max_tests) const {
         if (tests < max_tests) {
           out << "Arguments exhausted after " << tests << " tests."
             << std::endl;
@@ -27,7 +28,9 @@ namespace autocheck {
         }
       }
 
-      virtual void failure(size_t tests, const char* reason) {
+      virtual void failure(size_t tests, const char* reason) const {
+        printf("reached failure\n");
+        fflush(stdout);
         out << "Falsifiable, after " << tests << " tests:" << std::endl
           << reason << std::endl;
       }

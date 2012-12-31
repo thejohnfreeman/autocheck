@@ -11,6 +11,7 @@ TESTS := \
 	value \
 	arbitrary \
 	apply \
+	check \
 
 INSTALLDIR := bin
 INSTALLDIR := $(abspath $(INSTALLDIR))
