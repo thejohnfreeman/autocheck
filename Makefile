@@ -7,6 +7,8 @@ OBJECTS := $(SOURCES:%.c=$(OBJDIR)/$(SRCDIR)/%.o)
 TESTDIR := test
 TESTS := \
 	is_one_of \
+	largest \
+	value \
 	arbitrary \
 
 INSTALLDIR := bin
