@@ -12,7 +12,7 @@ TEST(Arbitrary, Sizes) {
 }
 
 TEST(ArbitraryBool, Generating) {
-  ac::arbitrary<bool> gen;
+  auto gen = ac::arbitrary<bool>();
 
   ac::value<bool> b;
   std::clog << std::boolalpha;
@@ -26,7 +26,7 @@ TEST(ArbitraryBool, Generating) {
 }
 
 TEST(ArbitraryBool, AtMost) {
-  ac::arbitrary<bool> gen;
+  auto gen = ac::arbitrary<bool>();
   gen.at_most(limit);
 
   ac::value<bool> b;
@@ -41,7 +41,7 @@ TEST(ArbitraryBool, AtMost) {
 }
 
 TEST(ArbitraryBool, Only) {
-  ac::arbitrary<bool> gen;
+  auto gen = ac::arbitrary<bool>();
   gen.only([] (bool b) { return b; });
 
   ac::value<bool> b;
@@ -55,7 +55,7 @@ TEST(ArbitraryBool, Only) {
 }
 
 TEST(ArbitraryBool, Chaining) {
-  ac::arbitrary<bool> gen;
+  auto gen = ac::arbitrary<bool>();
   gen.at_most(limit)
      .only([] (bool b) { return b; });
 
