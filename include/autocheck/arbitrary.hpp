@@ -11,127 +11,123 @@
 
 namespace autocheck {
 
-  /* Reusable mixin to support generation limits. */
+  /* Type of functions that adjust size of generated value. */
+  typedef std::function<size_t (size_t)> resizer_t;
 
-  class limitable {
-    private:
-      bool   is_limited;
-      size_t remaining;
-
-    protected:
-      limitable(size_t limit = 0)
-        : is_limited(limit != 0), remaining(limit) {}
-
-      void consume() {
-        assert(remaining > 0);
-        --remaining;
-      }
-
-    public:
-      bool exhausted() const { return is_limited && !remaining; }
-
-      void at_most(size_t limit) {
-        is_limited = true;
-        remaining  = limit;
-      }
+  /* Generic identity function. */
+  struct id {
+    template <typename T>
+    T&& operator() (T&& t) { return std::forward<T>(t); }
   };
 
-  /* Sets a limit on a generator derived from `limitable`. */
+  namespace detail {
 
-  template <typename Derived>
-  inline Derived&& at_most(size_t limit, Derived&& self) {
-    self.at_most(limit);
-    return std::forward<Derived>(self);
+    /* Base generators for arbitrary. */
+    template <typename T, typename Enable = void>
+    class generator;
+
+    template <>
+    class generator<bool> {
+      public:
+        typedef bool result_type;
+
+        result_type operator() (size_t) {
+          static std::random_device rd;
+          static std::mt19937 rng(rd());
+          static std::bernoulli_distribution dist(0.5);
+          return dist(rng);
+        }
+    };
+
   }
 
-  /* Decorator for filtering inputs. */
+  /* Model of our Arbitrary concept, which differs slightly from the one in
+   * QuickCheck. */
 
-  template <typename Gen>
-  class filtered_generator {
+  template <typename T, typename Base = detail::generator<T>>
+  class arbitrary {
     public:
-      typedef typename Gen::result_type result_type;
+      typedef T result_type;
+      static_assert(
+          std::is_convertible<typename Base::result_type, result_type>::value,
+          "incompatible Base generator");
 
     private:
       typedef typename predicate<result_type>::type filter_t;
       typedef std::vector<filter_t>                 filters_t;
 
-      Gen                base;
-      value<result_type> candidate;
-      filters_t          filters;
+      Base      base;
+      bool      is_limited;
+      size_t    count;
+      size_t    limit;
+      filters_t filters;
+      resizer_t resizer;
 
-      bool accepted() const {
+      /* Returns 0 on first call, and grows moderately. */
+      size_t size() const {
+        return resizer(count >> 1);
+      }
+
+      bool accepted(const result_type& candidate) const {
         return std::all_of(filters.begin(), filters.end(),
-            [&] (const filter_t& f) { return f(candidate); });
-      }
-
-      void maybe_advance1() {
-        assert(!candidate.empty());
-        if (!accepted()) advance1();
-      }
-
-      void advance1() {
-        while (!base.exhausted()) {
-          candidate = base();
-          if (accepted()) break;
-        }
+            [&] (const filter_t& accepts) { return accepts(candidate); });
       }
 
     public:
-      filtered_generator(const Gen& base)
-        : base(base)
-      {
-        /* We must advance before the first call to `exhausted` in case no
-         * generated values meet the filters. */
-        advance1();
+      arbitrary(const Base& base = Base()) :
+        base(base),
+        is_limited(false), count(0), limit(0),
+        filters(), resizer(id())
+      {}
+
+      bool operator() (value<result_type>& out) {
+        while (!is_limited || (++count < limit)) {
+          out = base(size());
+          if (accepted(out)) return true;
+        }
+        return false;
       }
 
-      result_type operator() () {
-        result_type rv(candidate);
-        advance1();
-        return rv;
+      arbitrary& at_most(size_t lmt) {
+        assert(lmt > 0);
+        is_limited = true;
+        count      = 0;
+        limit      = lmt + 1;
+        return *this;
       }
 
-      bool exhausted() const { return base.exhausted(); }
-
-      void only(const filter_t& f) {
+      arbitrary& only(const filter_t& f) {
         filters.push_back(f);
-        maybe_advance1();
+        return *this;
+      }
+
+      arbitrary& resize(const resizer_t& f) {
+        resizer = f;
+        return *this;
       }
   };
 
-  /* Decorates an undecorated generator with a filter. */
+  /* Combinators. */
 
-  template <typename Gen>
-  filtered_generator<Gen> only(
-      const typename predicate<typename Gen::result_type>::type& f,
-      const Gen& base)
-  {
-    filtered_generator<Gen> gen(base);
-    gen.only(f);
-    return std::move(gen);
+  template <typename T, typename Base>
+  arbitrary<T, Base>&& at_most(size_t limit, arbitrary<T, Base>&& self) {
+    self.at_most(limit);
+    return std::forward<arbitrary<T, Base>>(self);
   }
 
-  /* Adds another filter to an already-decorated generator. */
+  template <typename T, typename Base>
+  arbitrary<T, Base>&& only(const typename predicate<T>::type& f,
+      arbitrary<T, Base>&& self)
+  {
+    self.only(f);
+    return std::forward<arbitrary<T, Base>>(self);
+  }
 
-  /* `arbitrary` is a class providing a set of standard models for the
-   * Arbitrary concept. */
-
-  template <typename T, typename Enable = void>
-  class arbitrary;
-
-  template <>
-  class arbitrary<bool> : public limitable {
-    public:
-      typedef bool result_type;
-
-      result_type operator() () {
-        static std::random_device rd;
-        static std::mt19937 rng(rd());
-        static std::bernoulli_distribution dist(0.5);
-        consume();
-        return dist(rng);
-      }
-  };
+  template <typename T, typename Base>
+  arbitrary<T, Base>&& resize(const resizer_t& f, arbitrary<T, Base>&& self) {
+    self.resize(f);
+    return std::forward<arbitrary<T, Base>>(self);
+  }
 
 }
 

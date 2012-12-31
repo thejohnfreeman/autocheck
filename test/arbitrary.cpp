@@ -7,41 +7,83 @@ namespace ac = autocheck;
 static const size_t limit = 10;
 
 TEST(Arbitrary, Sizes) {
-  std::clog << "sizeof(limitable) = "
-    << sizeof(ac::limitable) << std::endl;
   std::clog << "sizeof(arbitrary<bool>) = "
     << sizeof(ac::arbitrary<bool>) << std::endl;
 }
 
-TEST(ArbitraryBool, LimitedFreeFunction) {
+TEST(ArbitraryBool, Generating) {
   ac::arbitrary<bool> gen;
-  ac::at_most(limit, gen);
 
+  ac::value<bool> b;
   std::clog << std::boolalpha;
   for (int i = 0; i < limit; ++i) {
-    std::clog << gen() << ", ";
+    ASSERT_TRUE(gen(b));
+    std::clog << b << ", ";
   }
   std::clog << std::endl;
 
-  ASSERT_TRUE(gen.exhausted());
+  ASSERT_TRUE(gen(b));
 }
 
-TEST(ArbitraryBool, LimitedCombinator) {
-  auto gen = ac::at_most(limit, ac::arbitrary<bool>());
+TEST(ArbitraryBool, AtMost) {
+  ac::arbitrary<bool> gen;
+  gen.at_most(limit);
 
+  ac::value<bool> b;
   std::clog << std::boolalpha;
   for (int i = 0; i < limit; ++i) {
-    std::clog << gen() << ", ";
+    ASSERT_TRUE(gen(b));
+    std::clog << b << ", ";
   }
   std::clog << std::endl;
 
-  ASSERT_TRUE(gen.exhausted());
+  ASSERT_FALSE(gen(b));
 }
 
-TEST(ArbitraryBool, Filtered) {
+TEST(ArbitraryBool, Only) {
+  ac::arbitrary<bool> gen;
+  gen.only([] (bool b) { return b; });
+
+  ac::value<bool> b;
+  std::clog << std::boolalpha;
+  for (int i = 0; i < limit; ++i) {
+    gen(b);
+    ASSERT_TRUE(b);
+    std::clog << b << ", ";
+  }
+  std::clog << std::endl;
+}
+
+TEST(ArbitraryBool, Chaining) {
+  ac::arbitrary<bool> gen;
+  gen.at_most(limit)
+     .only([] (bool b) { return b; });
+
+  ac::value<bool> b;
+  std::clog << std::boolalpha;
+  while (gen(b)) {
+    ASSERT_TRUE(b);
+    std::clog << b << ", ";
+  }
+  std::clog << std::endl;
+
+  ASSERT_FALSE(gen(b));
+}
+
+TEST(ArbitraryBool, Combinator) {
   auto gen =
-    ac::only([] (bool b) { return b; },
-     ac::at_most(limit,
-       ac::arbitrary<bool>()));
+    ac::at_most(limit,
+        ac::only([] (bool b) { return !b; },
+          ac::arbitrary<bool>()));
+
+  ac::value<bool> b;
+  std::clog << std::boolalpha;
+  while (gen(b)) {
+    ASSERT_FALSE(b);
+    std::clog << b << ", ";
+  }
+  std::clog << std::endl;
+
+  ASSERT_FALSE(gen(b));
 }
 
