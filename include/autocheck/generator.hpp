@@ -32,6 +32,25 @@ namespace autocheck {
 
     /* Wrappers used by combinators. */
 
+    template <typename T, typename Gen>
+    class mapped_generator {
+      public:
+        typedef T                                            result_type;
+        typedef std::function<T (typename Gen::result_type)> trans_t;
+
+      private:
+        trans_t trans;
+        Gen     gen;
+
+      public:
+        mapped_generator(const trans_t& trans, const Gen& gen) :
+          trans(trans), gen(gen) {}
+
+        result_type operator() (size_t size = 0) {
+          return trans(gen(size));
+        }
+    };
+
     template <typename Gen>
     class filtered_generator {
       public:
@@ -75,6 +94,14 @@ namespace autocheck {
   }
 
   /* Generator combinators. */
+
+  template <typename T, typename Gen>
+  detail::mapped_generator<T, Gen> map(
+      const std::function<T (typename Gen::result_type)>& trans,
+      const Gen& gen)
+  {
+    return detail::mapped_generator<T, Gen>(trans, gen);
+  }
 
   template <typename Gen>
   detail::filtered_generator<Gen> such_that(
