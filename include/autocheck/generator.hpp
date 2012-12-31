@@ -7,9 +7,6 @@
 
 namespace autocheck {
 
-  /* Type of functions that adjust size of generated value. */
-  typedef std::function<size_t (size_t)> resizer_t;
-
   /* Generators produce an infinite sequence. */
 
   template <typename T, typename Enable = void>
@@ -27,6 +24,9 @@ namespace autocheck {
         return dist(rng);
       }
   };
+
+  /* Type of functions that adjust size of generated value. */
+  typedef std::function<size_t (size_t)> resizer_t;
 
   namespace detail {
 
@@ -54,6 +54,24 @@ namespace autocheck {
         }
     };
 
+    template <typename Gen>
+    class resized_generator {
+      public:
+        typedef typename Gen::result_type result_type;
+
+      private:
+        resizer_t resizer;
+        Gen       gen;
+
+      public:
+        resized_generator(const resizer_t& resizer, const Gen& gen) :
+          resizer(resizer), gen(gen) {}
+
+        result_type operator() (size_t size = 0) {
+          return gen(resizer(size));
+        }
+    };
+
   }
 
   /* Generator combinators. */
@@ -64,6 +82,13 @@ namespace autocheck {
       const Gen& gen)
   {
     return detail::filtered_generator<Gen>(pred, gen);
+  }
+
+  template <typename Gen>
+  detail::resized_generator<Gen> resize(const resizer_t& resizer,
+      const Gen& gen)
+  {
+    return detail::resized_generator<Gen>(resizer, gen);
   }
 
 }

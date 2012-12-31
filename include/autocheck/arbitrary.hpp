@@ -16,21 +16,21 @@ namespace autocheck {
     T&& operator() (T&& t) { return std::forward<T>(t); }
   };
 
-  /* Model of our Arbitrary concept, which differs slightly from the one in
-   * QuickCheck. */
+  /* Arbitrary produces a finite sequence, always in a tuple, ready for
+   * application. */
 
-  template <typename... Arbs>
+  template <typename... Gens>
   class arbitrary {
     public:
-      typedef std::tuple<typename Arbs::result_type...> result_type;
+      typedef std::tuple<typename Gens::result_type...> result_type;
 
     private:
-      typedef typename predicate<typename Arbs::result_type...>::type
+      typedef typename predicate<typename Gens::result_type...>::type
         filter_t;
       typedef std::vector<filter_t>
         filters_t;
 
-      std::tuple<Arbs...> arbs;
+      std::tuple<Gens...> arbs;
       bool                is_limited;
       size_t              count;
       size_t              limit;
@@ -50,15 +50,15 @@ namespace autocheck {
 
       template <int... Is>
       result_type generate(size_t size,
-          const range<0, Is...>& = range<sizeof...(Arbs)>())
+          const range<0, Is...>& = range<sizeof...(Gens)>())
       {
         return result_type(std::get<Is>(arbs)(size)...);
       }
 
     public:
-      arbitrary() : arbitrary(Arbs()...) {}
+      arbitrary() : arbitrary(Gens()...) {}
 
-      arbitrary(const Arbs&... arbs) :
+      arbitrary(const Gens&... arbs) :
         arbs(arbs...),
         is_limited(false), count(0), limit(0),
         filters(), resizer(id())
@@ -93,24 +93,18 @@ namespace autocheck {
 
   /* Combinators. */
 
-  template <typename... Arbs>
-  arbitrary<Arbs...>&& at_most(size_t limit, arbitrary<Arbs...>&& self) {
+  template <typename... Gens>
+  arbitrary<Gens...>&& at_most(size_t limit, arbitrary<Arbs...>&& self) {
     self.at_most(limit);
-    return std::forward<arbitrary<Arbs...>>(self);
+    return std::forward<arbitrary<Gens...>>(self);
   }
 
-  template <typename... Arbs>
-  arbitrary<Arbs...>&& only(const typename predicate<Arbs...>::type& f,
-      arbitrary<Arbs...>&& self)
+  template <typename... Gens>
+  arbitrary<Gens...>&& only(const typename predicate<Arbs...>::type& f,
+      arbitrary<Gens...>&& self)
   {
     self.only(f);
-    return std::forward<arbitrary<Arbs...>>(self);
-  }
-
-  template <typename... Arbs>
-  arbitrary<Arbs...>&& resize(const resizer_t& f, arbitrary<Arbs...>&& self) {
-    self.resize(f);
-    return std::forward<arbitrary<Arbs...>>(self);
+    return std::forward<arbitrary<Gens...>>(self);
   }
 
   template <typename... Ts>

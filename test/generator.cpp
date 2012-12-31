@@ -21,6 +21,15 @@ TEST(GeneratorBool, Generating) {
   std::clog << std::endl;
 }
 
+TEST(Generator, Resize) {
+  auto gen = ac::resize([] (size_t size) { return size * 2; },
+      ac::generator<bool>());
+
+  for (int i = 0; i < limit; ++i) {
+    gen();
+  }
+}
+
 TEST(Generator, SuchThat) {
   auto gen = ac::such_that([] (bool b) { return b; },
       ac::generator<bool>());
