@@ -2,18 +2,13 @@
 #define AUTOCHECK_ARBITRARY_HPP
 
 #include <cassert>
-#include <random>
 #include <cstdio>
 
 #include "is_one_of.hpp"
 #include "value.hpp"
-#include "predicate.hpp"
 #include "apply.hpp"
 
 namespace autocheck {
-
-  /* Type of functions that adjust size of generated value. */
-  typedef std::function<size_t (size_t)> resizer_t;
 
   /* Generic identity function. */
   struct id {
@@ -21,32 +16,11 @@ namespace autocheck {
     T&& operator() (T&& t) { return std::forward<T>(t); }
   };
 
-  namespace detail {
-
-    /* Base generators for generator. */
-    template <typename T, typename Enable = void>
-    class arbitrary;
-
-    template <>
-    class arbitrary<bool> {
-      public:
-        typedef bool result_type;
-
-        result_type operator() (size_t) {
-          static std::random_device rd;
-          static std::mt19937 rng(rd());
-          static std::bernoulli_distribution dist(0.5);
-          return dist(rng);
-        }
-    };
-
-  }
-
   /* Model of our Arbitrary concept, which differs slightly from the one in
    * QuickCheck. */
 
   template <typename... Arbs>
-  class generator {
+  class arbitrary {
     public:
       typedef std::tuple<typename Arbs::result_type...> result_type;
 
@@ -82,9 +56,9 @@ namespace autocheck {
       }
 
     public:
-      generator() : generator(Arbs()...) {}
+      arbitrary() : arbitrary(Arbs()...) {}
 
-      generator(const Arbs&... arbs) :
+      arbitrary(const Arbs&... arbs) :
         arbs(arbs...),
         is_limited(false), count(0), limit(0),
         filters(), resizer(id())
@@ -98,7 +72,7 @@ namespace autocheck {
         return false;
       }
 
-      generator& at_most(size_t lmt) {
+      arbitrary& at_most(size_t lmt) {
         assert(lmt > 0);
         is_limited = true;
         count      = 0;
@@ -106,12 +80,12 @@ namespace autocheck {
         return *this;
       }
 
-      generator& only(const filter_t& f) {
+      arbitrary& only(const filter_t& f) {
         filters.push_back(f);
         return *this;
       }
 
-      generator& resize(const resizer_t& f) {
+      arbitrary& resize(const resizer_t& f) {
         resizer = f;
         return *this;
       }
@@ -120,28 +94,28 @@ namespace autocheck {
   /* Combinators. */
 
   template <typename... Arbs>
-  generator<Arbs...>&& at_most(size_t limit, generator<Arbs...>&& self) {
+  arbitrary<Arbs...>&& at_most(size_t limit, arbitrary<Arbs...>&& self) {
     self.at_most(limit);
-    return std::forward<generator<Arbs...>>(self);
+    return std::forward<arbitrary<Arbs...>>(self);
   }
 
   template <typename... Arbs>
-  generator<Arbs...>&& only(const typename predicate<Arbs...>::type& f,
-      generator<Arbs...>&& self)
+  arbitrary<Arbs...>&& only(const typename predicate<Arbs...>::type& f,
+      arbitrary<Arbs...>&& self)
   {
     self.only(f);
-    return std::forward<generator<Arbs...>>(self);
+    return std::forward<arbitrary<Arbs...>>(self);
   }
 
   template <typename... Arbs>
-  generator<Arbs...>&& resize(const resizer_t& f, generator<Arbs...>&& self) {
+  arbitrary<Arbs...>&& resize(const resizer_t& f, arbitrary<Arbs...>&& self) {
     self.resize(f);
-    return std::forward<generator<Arbs...>>(self);
+    return std::forward<arbitrary<Arbs...>>(self);
   }
 
   template <typename... Ts>
-  generator<detail::arbitrary<Ts>...> arbitrary() {
-    return generator<detail::arbitrary<Ts>...>();
+  arbitrary<detail::generator<Ts>...> generator() {
+    return arbitrary<detail::generator<Ts>...>();
   }
 
 }

@@ -9,9 +9,8 @@ TESTS := \
 	is_one_of \
 	largest \
 	value \
-	arbitrary \
 	apply \
-	check \
+	generator \
 
 INSTALLDIR := bin
 INSTALLDIR := $(abspath $(INSTALLDIR))
