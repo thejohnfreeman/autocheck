@@ -10,6 +10,7 @@ TESTS := \
 	largest \
 	value \
 	arbitrary \
+	apply \
 
 INSTALLDIR := bin
 INSTALLDIR := $(abspath $(INSTALLDIR))
