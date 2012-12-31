@@ -30,16 +30,17 @@ namespace autocheck {
     public:
       bool exhausted() const { return is_limited && !remaining; }
 
-      template <typename Derived>
-      friend Derived&& at_most(size_t, Derived&&);
+      void at_most(size_t limit) {
+        is_limited = true;
+        remaining  = limit;
+      }
   };
 
   /* Sets a limit on a generator derived from `limitable`. */
 
   template <typename Derived>
   inline Derived&& at_most(size_t limit, Derived&& self) {
-    self.is_limited = true;
-    self.remaining  = limit;
+    self.at_most(limit);
     return std::forward<Derived>(self);
   }
 
