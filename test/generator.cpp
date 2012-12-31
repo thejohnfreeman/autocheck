@@ -18,13 +18,13 @@ TEST(GeneratorBool, Generating) {
 }
 
 TEST(Generator, Map) {
-  const int n = 42;
-  auto gen = ac::map<int>([] (bool) { return n; },
+  auto gen = ac::map<int>([] (bool, size_t n) { return n; },
       ac::generator<bool>());
   std::clog << "sizeof(gen) = " << sizeof(gen) << std::endl;
 
+  const int n = 42;
   for (int i = 0; i < limit; ++i) {
-    ASSERT_EQ(n, gen());
+    ASSERT_EQ(n, gen(n));
   }
 }
 
@@ -45,6 +45,19 @@ TEST(Generator, Resize) {
 
   for (int i = 0; i < limit; ++i) {
     gen();
+  }
+}
+
+TEST(Generator, Composition) {
+  const int factor = 2;
+  auto gen = ac::resize([] (size_t size) { return size * factor; },
+      ac::map<int>([] (bool, size_t n) { return n; },
+        ac::generator<bool>()));
+  std::clog << "sizeof(gen) = " << sizeof(gen) << std::endl;
+
+  const int n = 42;
+  for (int i = 0; i < limit; ++i) {
+    ASSERT_EQ(n * factor, gen(n));
   }
 }
 

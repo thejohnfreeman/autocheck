@@ -35,8 +35,10 @@ namespace autocheck {
     template <typename T, typename Gen>
     class mapped_generator {
       public:
-        typedef T                                            result_type;
-        typedef std::function<T (typename Gen::result_type)> trans_t;
+        typedef T
+          result_type;
+        typedef std::function<T (const typename Gen::result_type&, size_t)>
+          trans_t;
 
       private:
         trans_t trans;
@@ -47,7 +49,7 @@ namespace autocheck {
           trans(trans), gen(gen) {}
 
         result_type operator() (size_t size = 0) {
-          return trans(gen(size));
+          return trans(gen(size), size);
         }
     };
 
@@ -97,7 +99,7 @@ namespace autocheck {
 
   template <typename T, typename Gen>
   detail::mapped_generator<T, Gen> map(
-      const std::function<T (typename Gen::result_type)>& trans,
+      const typename detail::mapped_generator<T, Gen>::trans_t& trans,
       const Gen& gen)
   {
     return detail::mapped_generator<T, Gen>(trans, gen);
