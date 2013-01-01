@@ -8,6 +8,7 @@
 #include "is_one_of.hpp"
 #include "predicate.hpp"
 #include "generator_combinators.hpp"
+#include "apply.hpp"
 
 namespace autocheck {
 
@@ -16,6 +17,18 @@ namespace autocheck {
     static std::random_device rd;
     static std::mt19937 rng(rd());
     return rng;
+  }
+
+  template <typename T, typename... Gens, int... Is>
+  T generate(std::tuple<Gens...>& gens, size_t size,
+      const range<0, Is...>&)
+  {
+    return T(std::get<Is>(gens)(size)...);
+  }
+
+  template <typename T, typename... Gens>
+  T generate(std::tuple<Gens...>& gens, size_t size) {
+    return generate<T>(gens, size, range<sizeof...(Gens)>());
   }
 
   /* Generators produce an infinite sequence. */
@@ -76,6 +89,23 @@ namespace autocheck {
   list_generator<T, Gen> list_of(const Gen& gen = Gen()) {
     return list_generator<T, Gen>(gen);
   }
+
+  /* TODO: Generic type generator (by construction). */
+  template <typename T, typename... Gens>
+  class cons_generator {
+    private:
+      std::tuple<Gens...> gens;
+
+    public:
+      cons_generator(const Gens&... gens) :
+        gens(gens...) {}
+
+      typedef T result_type;
+
+      result_type operator() (size_t size) {
+        return generate<result_type>(gens, size - 1);
+      }
+  };
 
 }
 

@@ -42,20 +42,6 @@ namespace autocheck {
       premise_t           premise;
       resizer_t           resizer;
 
-      /* Returns 0 on first call, and grows moderately. */
-      size_t size() const {
-        return resizer(count >> 1);
-      }
-
-      bool accepted(const result_type& candidate) const {
-        return apply(premise, candidate);
-      }
-
-      template <int... Is>
-      result_type generate(size_t size, const range<0, Is...>&) {
-        return result_type(std::get<Is>(gens)(size)...);
-      }
-
     public:
       template <typename... Args>
       arbitrary(const Args&... args) :
@@ -64,10 +50,11 @@ namespace autocheck {
         premise(always()), resizer(id())
       {}
 
-      bool operator() (value<result_type>& out) {
+      bool operator() (value<result_type>& candidate) {
         while (!is_finite || (num_discards < max_discards)) {
-          out = generate(size(), range<sizeof...(Gens)>());
-          if (accepted(out)) {
+          /* Size starts at 0 and grows moderately. */
+          candidate = generate<result_type>(gens, resizer(count >> 1));
+          if (apply(premise, candidate.cref())) {
             ++count;
             return true;
           } else {
