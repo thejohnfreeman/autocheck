@@ -26,13 +26,14 @@ namespace autocheck {
 
   template <typename... Gens>
   class arbitrary {
+    static_assert(sizeof...(Gens) > 0, "cannot create unit arbitrary");
     public:
       typedef std::tuple<typename Gens::result_type...> result_type;
 
-    private:
       typedef typename predicate<typename Gens::result_type...>::type
         premise_t;
 
+    private:
       std::tuple<Gens...> gens;
       bool                is_finite;
       size_t              count;
@@ -51,9 +52,7 @@ namespace autocheck {
       }
 
       template <int... Is>
-      result_type generate(size_t size,
-          const range<0, Is...>& = range<sizeof...(Gens)>())
-      {
+      result_type generate(size_t size, const range<0, Is...>&) {
         return result_type(std::get<Is>(gens)(size)...);
       }
 
@@ -67,7 +66,7 @@ namespace autocheck {
 
       bool operator() (value<result_type>& out) {
         while (!is_finite || (num_discards < max_discards)) {
-          out = generate(size());
+          out = generate(size(), range<sizeof...(Gens)>());
           if (accepted(out)) {
             return true;
           } else {
@@ -100,9 +99,39 @@ namespace autocheck {
       }
   };
 
+  /* Combinators. */
+
+  template <typename... Gens>
+  arbitrary<Gens...>&& at_most(size_t discards, arbitrary<Gens...>&& arb) {
+    arb.at_most(discards);
+    return std::forward<arbitrary<Gens...>>(arb);
+  }
+
+  template <typename... Gens>
+  arbitrary<Gens...>&& only_if(
+      const typename arbitrary<Gens...>::premise_t& p,
+      arbitrary<Gens...>&& arb)
+  {
+    arb.only_if(p);
+    return std::forward<arbitrary<Gens...>>(arb);
+  }
+
+  template <typename... Gens>
+  arbitrary<Gens...>&& resize(const resizer_t& r, arbitrary<Gens...>&& arb) {
+    arb.resize(r);
+    return std::forward<arbitrary<Gens...>>(arb);
+  }
+
+  /* Factories. */
+
   template <typename... Gens>
   arbitrary<Gens...> make_arbitrary(const Gens&... gens) {
     return arbitrary<Gens...>(gens...);
+  }
+
+  template <typename... Types>
+  arbitrary<generator<Types...>> make_arbitrary() {
+    return arbitrary<generator<Types...>>(generator<Types>()...);
   }
 
 }

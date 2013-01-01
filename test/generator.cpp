@@ -12,7 +12,8 @@ TEST(GeneratorBool, Generating) {
 
   std::clog << std::boolalpha;
   for (int i = 0; i < limit; ++i) {
-    std::clog << gen() << ", ";
+    if (i > 0) std::clog << ", ";
+    std::clog << gen();
   }
   std::clog << std::endl;
 }

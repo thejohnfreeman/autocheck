@@ -6,82 +6,94 @@ namespace ac = autocheck;
 
 static const size_t limit = 10;
 
+template <size_t I, typename... Ts>
+void print(std::ostream& out, const std::tuple<Ts...>& tup,
+    const std::integral_constant<size_t, I>& = std::integral_constant<size_t, I>())
+{
+  out << std::get<I>(tup);
+  out << ", ";
+}
+
+template <typename... Ts>
+void print(std::ostream& out, const std::tuple<Ts...>& tup, const std::integral_constant<size_t, 0>&) {
+  out << std::get<0>(tup);
+}
+
+namespace std {
+
+  template <typename... Ts>
+  std::ostream& operator<< (std::ostream& out, const std::tuple<Ts...>& tup) {
+    out << "(";
+    print(out, tup, std::integral_constant<size_t, sizeof...(Ts) - 1>());
+    out << ")";
+    return out;
+  }
+
+}
+
 TEST(ArbitraryBool, Generating) {
-  auto arb = ac::make_arbitrary(ac::generator<bool>());
+  auto arb = ac::make_arbitrary<bool>();
+
+  ac::value<std::tuple<bool>> b;
+  std::clog << std::boolalpha;
+  for (int i = 0; i < limit; ++i) {
+    ASSERT_TRUE(arb(b));
+    if (i > 0) std::clog << ", ";
+    std::clog << b;
+  }
+  std::clog << std::endl;
+
+  ASSERT_TRUE(arb(b));
+}
+
+TEST(ArbitraryBool, Only) {
+  auto arb = ac::make_arbitrary<bool>();
+  arb.only_if([] (bool b) { return b; });
 
   ac::value<std::tuple<bool>> b;
   std::clog << std::boolalpha;
   for (int i = 0; i < limit; ++i) {
     arb(b);
-    //ASSERT_TRUE(std::get<0>(arb(b)));
-    //std::clog << std::get<0>(b) << ", ";
+    ASSERT_TRUE(std::get<0>(b.cref()));
+    if (i > 0) std::clog << ", ";
+    std::clog << b;
   }
   std::clog << std::endl;
-
-  //ASSERT_TRUE(arb(b));
 }
 
-/*
 TEST(ArbitraryBool, AtMost) {
-  auto gen = ac::arbitrary<bool>();
-  gen.at_most(limit);
+  auto arb = ac::make_arbitrary<bool>();
+  arb.only_if([] (bool b) { return b; });
+  arb.at_most(limit);
 
-  ac::value<bool> b;
+  ac::value<std::tuple<bool>> b;
   std::clog << std::boolalpha;
-  for (int i = 0; i < limit; ++i) {
-    ASSERT_TRUE(gen(b));
-    std::clog << b << ", ";
+  bool first = true;
+  while (arb(b)) {
+    if (first) {
+      first = false;
+    } else {
+      std::clog << ", ";
+    }
+    ASSERT_TRUE(std::get<0>(b.cref()));
+    std::clog << b;
   }
   std::clog << std::endl;
 
-  ASSERT_FALSE(gen(b));
-}
-
-TEST(ArbitraryBool, Only) {
-  auto gen = ac::arbitrary<bool>();
-  gen.only([] (bool b) { return b; });
-
-  ac::value<bool> b;
-  std::clog << std::boolalpha;
-  for (int i = 0; i < limit; ++i) {
-    gen(b);
-    ASSERT_TRUE(b);
-    std::clog << b << ", ";
-  }
-  std::clog << std::endl;
-}
-
-TEST(ArbitraryBool, Chaining) {
-  auto gen = ac::arbitrary<bool>();
-  gen.at_most(limit)
-     .only([] (bool b) { return b; });
-
-  ac::value<bool> b;
-  std::clog << std::boolalpha;
-  while (gen(b)) {
-    ASSERT_TRUE(b);
-    std::clog << b << ", ";
-  }
-  std::clog << std::endl;
-
-  ASSERT_FALSE(gen(b));
+  ASSERT_FALSE(arb(b));
 }
 
 TEST(ArbitraryBool, Combinator) {
-  auto gen =
+  auto arb =
     ac::at_most(limit,
-        ac::only([] (bool b) { return !b; },
-          ac::arbitrary<bool>()));
+        ac::only_if([] (bool b) { return !b; },
+          ac::make_arbitrary<bool>()));
 
-  ac::value<bool> b;
-  std::clog << std::boolalpha;
-  while (gen(b)) {
-    ASSERT_FALSE(b);
-    std::clog << b << ", ";
+  ac::value<std::tuple<bool>> b;
+  while (arb(b)) {
+    ASSERT_FALSE(std::get<0>(b.cref()));
   }
-  std::clog << std::endl;
 
-  ASSERT_FALSE(gen(b));
+  ASSERT_FALSE(arb(b));
 }
-*/
 

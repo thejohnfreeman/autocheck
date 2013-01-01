@@ -92,6 +92,11 @@ namespace autocheck {
 
   };
 
+  template <typename T>
+  std::ostream& operator<< (std::ostream& out, const value<T>& v) {
+    return out << v.cref();
+  }
+
 }
 
 #endif
