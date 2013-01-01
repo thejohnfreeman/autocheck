@@ -4,7 +4,7 @@
 #include <cassert>
 #include <cstdio>
 
-#include "is_one_of.hpp"
+#include "generator.hpp"
 #include "value.hpp"
 #include "apply.hpp"
 
@@ -13,11 +13,16 @@ namespace autocheck {
   /* Generic identity function. */
   struct id {
     template <typename T>
-    T&& operator() (T&& t) { return std::forward<T>(t); }
+    T&& operator() (T&& t) const { return std::forward<T>(t); }
+  };
+
+  struct always {
+    template <typename T>
+    bool operator() (const T& t) const { return true; }
   };
 
   /* Arbitrary produces a finite sequence, always in a tuple, ready for
-   * application. */
+   * application, and counts discards. */
 
   template <typename... Gens>
   class arbitrary {
@@ -26,15 +31,14 @@ namespace autocheck {
 
     private:
       typedef typename predicate<typename Gens::result_type...>::type
-        filter_t;
-      typedef std::vector<filter_t>
-        filters_t;
+        premise_t;
 
-      std::tuple<Gens...> arbs;
-      bool                is_limited;
+      std::tuple<Gens...> gens;
+      bool                is_finite;
       size_t              count;
-      size_t              limit;
-      filters_t           filters;
+      size_t              num_discards;
+      size_t              max_discards;
+      premise_t           premise;
       resizer_t           resizer;
 
       /* Returns 0 on first call, and grows moderately. */
@@ -43,73 +47,62 @@ namespace autocheck {
       }
 
       bool accepted(const result_type& candidate) const {
-        return std::all_of(filters.begin(), filters.end(),
-            [&] (const filter_t& accepts) {
-              return apply(accepts, candidate); });
+        return apply(premise, candidate);
       }
 
       template <int... Is>
       result_type generate(size_t size,
           const range<0, Is...>& = range<sizeof...(Gens)>())
       {
-        return result_type(std::get<Is>(arbs)(size)...);
+        return result_type(std::get<Is>(gens)(size)...);
       }
 
     public:
-      arbitrary() : arbitrary(Gens()...) {}
-
-      arbitrary(const Gens&... arbs) :
-        arbs(arbs...),
-        is_limited(false), count(0), limit(0),
-        filters(), resizer(id())
+      template <typename... Args>
+      arbitrary(const Args&... args) :
+        gens(args...),
+        is_finite(false), count(0), num_discards(0), max_discards(0),
+        premise(always()), resizer(id())
       {}
 
       bool operator() (value<result_type>& out) {
-        while (!is_limited || (++count < limit)) {
+        while (!is_finite || (num_discards < max_discards)) {
           out = generate(size());
-          if (accepted(out)) return true;
+          if (accepted(out)) {
+            return true;
+          } else {
+            ++num_discards;
+          }
         }
         return false;
       }
 
-      arbitrary& at_most(size_t lmt) {
-        assert(lmt > 0);
-        is_limited = true;
-        count      = 0;
-        limit      = lmt + 1;
+      arbitrary& reset() {
+        num_discards = 0;
+        count        = 0;
+      }
+
+      arbitrary& at_most(size_t discards) {
+        assert(discards > 0);
+        is_finite    = true;
+        max_discards = discards;
         return *this;
       }
 
-      arbitrary& only(const filter_t& f) {
-        filters.push_back(f);
+      arbitrary& only_if(const premise_t& p) {
+        premise = p;
         return *this;
       }
 
-      arbitrary& resize(const resizer_t& f) {
-        resizer = f;
+      arbitrary& resize(const resizer_t& r) {
+        resizer = r;
         return *this;
       }
   };
 
-  /* Combinators. */
-
   template <typename... Gens>
-  arbitrary<Gens...>&& at_most(size_t limit, arbitrary<Arbs...>&& self) {
-    self.at_most(limit);
-    return std::forward<arbitrary<Gens...>>(self);
-  }
-
-  template <typename... Gens>
-  arbitrary<Gens...>&& only(const typename predicate<Arbs...>::type& f,
-      arbitrary<Gens...>&& self)
-  {
-    self.only(f);
-    return std::forward<arbitrary<Gens...>>(self);
-  }
-
-  template <typename... Ts>
-  arbitrary<detail::generator<Ts>...> generator() {
-    return arbitrary<detail::generator<Ts>...>();
+  arbitrary<Gens...> make_arbitrary(const Gens&... gens) {
+    return arbitrary<Gens...>(gens...);
   }
 
 }

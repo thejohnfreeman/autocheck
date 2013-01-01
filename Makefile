@@ -11,6 +11,7 @@ TESTS := \
 	value \
 	apply \
 	generator \
+	arbitrary \
 
 INSTALLDIR := bin
 INSTALLDIR := $(abspath $(INSTALLDIR))
