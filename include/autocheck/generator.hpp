@@ -3,11 +3,18 @@
 
 #include <random>
 
+#include "is_one_of.hpp"
 #include "predicate.hpp"
 
 namespace autocheck {
 
   /* Generators produce an infinite sequence. */
+
+  static std::mt19937& rng() {
+    static std::random_device rd;
+    static std::mt19937 rng(rd());
+    return rng;
+  }
 
   template <typename T, typename Enable = void>
   class generator;
@@ -18,10 +25,26 @@ namespace autocheck {
       typedef bool result_type;
 
       result_type operator() (size_t = 0) {
-        static std::random_device rd;
-        static std::mt19937 rng(rd());
         static std::bernoulli_distribution dist(0.5);
-        return dist(rng);
+        return dist(rng());
+      }
+  };
+
+  template <typename T>
+  class generator<
+    T,
+    typename std::enable_if<
+      is_one_of<T, short, int, long, long long>::value
+    >::type
+  >
+  {
+    public:
+      typedef T result_type;
+
+      result_type operator() (size_t size) {
+        /* Distribution is non-static. */
+        std::uniform_int_distribution<T> dist(-size, size);
+        return dist(rng());
       }
   };
 

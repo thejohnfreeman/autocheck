@@ -5,26 +5,31 @@
 
 namespace ac = autocheck;
 
-static const size_t limit = 10;
+static const size_t limit = 20;
 
 TEST(ArbitraryBool, Size) {
   auto arb = ac::make_arbitrary<bool>();
   std::clog << "sizeof(arb) = " << sizeof(arb) << std::endl;
 }
 
-TEST(Arbitrary, Generating) {
-  auto arb = ac::make_arbitrary<bool>();
+TEST(ArbitraryInt, Size) {
+  auto arb = ac::make_arbitrary<int>();
+  std::clog << "sizeof(arb) = " << sizeof(arb) << std::endl;
+}
 
-  ac::value<std::tuple<bool>> b;
+TEST(Arbitrary, Generating) {
+  auto arb = ac::make_arbitrary<int>();
+
+  ac::value<std::tuple<int>> args;
   std::clog << std::boolalpha;
   for (int i = 0; i < limit; ++i) {
-    ASSERT_TRUE(arb(b));
+    ASSERT_TRUE(arb(args));
     if (i > 0) std::clog << ", ";
-    std::clog << b;
+    std::clog << args;
   }
   std::clog << std::endl;
 
-  ASSERT_TRUE(arb(b));
+  ASSERT_TRUE(arb(args));
 }
 
 TEST(Arbitrary, Only) {

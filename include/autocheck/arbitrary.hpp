@@ -68,6 +68,7 @@ namespace autocheck {
         while (!is_finite || (num_discards < max_discards)) {
           out = generate(size(), range<sizeof...(Gens)>());
           if (accepted(out)) {
+            ++count;
             return true;
           } else {
             ++num_discards;
