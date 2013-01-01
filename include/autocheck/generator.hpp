@@ -53,13 +53,13 @@ namespace autocheck {
   };
 
   /* TODO: Generic sequence generator. */
-  template <typename T>
-  class generator<std::vector<T>> {
+  template <typename T, typename Gen = generator<T>>
+  class list_generator {
     private:
-      generator<T> eltgen;
+      Gen eltgen;
 
     public:
-      generator(const generator<T> eltgen = generator<T>()) :
+      list_generator(const Gen& eltgen = Gen()) :
         eltgen(eltgen) {}
 
       typedef std::vector<T> result_type;
@@ -71,6 +71,11 @@ namespace autocheck {
         return rv;
       }
   };
+
+  template <typename T, typename Gen = generator<T>>
+  list_generator<T, Gen> list_of(const Gen& gen = Gen()) {
+    return list_generator<T, Gen>(gen);
+  }
 
 }
 

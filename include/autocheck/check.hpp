@@ -27,6 +27,7 @@ namespace autocheck {
     typedef std::tuple<Args...> args_t;
     value<args_t> args;
     while (arb(args) && (++tests != max_tests)) {
+      //std::cout << "args = " << args << std::endl;
       if (!apply(pred, args.cref())) {
         std::ostringstream reason;
         reason << std::boolalpha << args;

@@ -18,6 +18,6 @@ TEST(Check, Compiles) {
         std::reverse(b.begin(), b.end());
         return a == b;
       },
-      ac::make_arbitrary<std::vector<int>>());
+      ac::make_arbitrary(ac::list_of<int>()));
 }
 
