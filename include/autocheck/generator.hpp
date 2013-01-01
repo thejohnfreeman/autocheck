@@ -2,6 +2,8 @@
 #define AUTOCHECK_GENERATOR_HPP
 
 #include <random>
+#include <vector>
+#include <iterator>
 
 #include "is_one_of.hpp"
 #include "predicate.hpp"
@@ -30,21 +32,41 @@ namespace autocheck {
       }
   };
 
-  template <typename T>
+  template <typename SignedIntegral>
   class generator<
-    T,
+    SignedIntegral,
     typename std::enable_if<
-      is_one_of<T, short, int, long, long long>::value
+      is_one_of<SignedIntegral, short, int, long, long long>::value
     >::type
   >
   {
     public:
-      typedef T result_type;
+      typedef SignedIntegral result_type;
 
       result_type operator() (size_t size) {
         /* Distribution is non-static. */
-        std::uniform_int_distribution<T> dist(-size, size);
+        std::uniform_int_distribution<SignedIntegral> dist(-size, size);
         return dist(rng());
+      }
+  };
+
+  /* TODO: Generic sequence generator. */
+  template <typename T>
+  class generator<std::vector<T>> {
+    private:
+      generator<T> eltgen;
+
+    public:
+      generator(const generator<T> eltgen = generator<T>()) :
+        eltgen(eltgen) {}
+
+      typedef std::vector<T> result_type;
+
+      result_type operator() (size_t size) {
+        result_type rv;
+        std::generate_n(std::back_insert_iterator<result_type>(rv), size,
+            [=] { return eltgen(size); });
+        return rv;
       }
   };
 
