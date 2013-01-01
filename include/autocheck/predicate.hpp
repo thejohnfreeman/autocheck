@@ -10,6 +10,9 @@ namespace autocheck {
     typedef std::function<bool (Args...)> type;
   };
 
+  /* Type of functions that adjust size of generated value. */
+  typedef std::function<size_t (size_t)> resizer_t;
+
 }
 
 #endif
