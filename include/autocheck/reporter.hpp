@@ -29,8 +29,6 @@ namespace autocheck {
       }
 
       virtual void failure(size_t tests, const char* reason) const {
-        printf("reached failure\n");
-        fflush(stdout);
         out << "Falsifiable, after " << tests << " tests:" << std::endl
           << reason << std::endl;
       }

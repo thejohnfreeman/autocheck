@@ -1,37 +1,18 @@
 #include <iostream>
 #include <gtest/gtest.h>
 #include <autocheck/arbitrary.hpp>
+#include <autocheck/tuple.hpp>
 
 namespace ac = autocheck;
 
 static const size_t limit = 10;
 
-template <size_t I, typename... Ts>
-void print(std::ostream& out, const std::tuple<Ts...>& tup,
-    const std::integral_constant<size_t, I>& = std::integral_constant<size_t, I>())
-{
-  out << std::get<I>(tup);
-  out << ", ";
+TEST(ArbitraryBool, Size) {
+  auto arb = ac::make_arbitrary<bool>();
+  std::clog << "sizeof(arb) = " << sizeof(arb) << std::endl;
 }
 
-template <typename... Ts>
-void print(std::ostream& out, const std::tuple<Ts...>& tup, const std::integral_constant<size_t, 0>&) {
-  out << std::get<0>(tup);
-}
-
-namespace std {
-
-  template <typename... Ts>
-  std::ostream& operator<< (std::ostream& out, const std::tuple<Ts...>& tup) {
-    out << "(";
-    print(out, tup, std::integral_constant<size_t, sizeof...(Ts) - 1>());
-    out << ")";
-    return out;
-  }
-
-}
-
-TEST(ArbitraryBool, Generating) {
+TEST(Arbitrary, Generating) {
   auto arb = ac::make_arbitrary<bool>();
 
   ac::value<std::tuple<bool>> b;
@@ -46,7 +27,7 @@ TEST(ArbitraryBool, Generating) {
   ASSERT_TRUE(arb(b));
 }
 
-TEST(ArbitraryBool, Only) {
+TEST(Arbitrary, Only) {
   auto arb = ac::make_arbitrary<bool>();
   arb.only_if([] (bool b) { return b; });
 
@@ -61,7 +42,7 @@ TEST(ArbitraryBool, Only) {
   std::clog << std::endl;
 }
 
-TEST(ArbitraryBool, AtMost) {
+TEST(Arbitrary, AtMost) {
   auto arb = ac::make_arbitrary<bool>();
   arb.only_if([] (bool b) { return b; });
   arb.at_most(limit);
@@ -83,7 +64,7 @@ TEST(ArbitraryBool, AtMost) {
   ASSERT_FALSE(arb(b));
 }
 
-TEST(ArbitraryBool, Combinator) {
+TEST(Arbitrary, Combinator) {
   auto arb =
     ac::at_most(limit,
         ac::only_if([] (bool b) { return !b; },
