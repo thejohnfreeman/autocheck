@@ -24,5 +24,7 @@ TEST(Check, Compiles) {
       ac::make_arbitrary(ac::list_of<int>()));
   ac::check<std::vector<int>>(100, reverse_prop,
       ac::make_arbitrary(ac::cons<std::vector<int>, unsigned int, int>()));
+  ac::check<std::vector<int>>(100, reverse_prop,
+      ac::make_arbitrary(ac::ordered_list<int>()));
 }
 

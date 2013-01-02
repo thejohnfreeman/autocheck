@@ -114,6 +114,17 @@ namespace autocheck {
   template <typename T>
   class generator<std::vector<T>> : public list_generator<T> {};
 
+  template <typename T, typename Gen = generator<T>>
+  detail::mapped_generator<std::vector<T>, list_generator<T, Gen>>
+  ordered_list(const Gen& gen = Gen()) {
+    return map<std::vector<T>>(
+        [] (std::vector<T>&& a, size_t) {
+          std::sort(a.begin(), a.end());
+          return std::move(a);
+        },
+        list_of<T>(gen));
+  }
+
   /* TODO: Generic type generator (by construction). */
   template <typename T, typename... Gens>
   class cons_generator {
