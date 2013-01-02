@@ -78,25 +78,24 @@ namespace autocheck {
 
   /* Combinators. */
 
-  template <typename... Gens>
-  arbitrary<Gens...>&& at_most(size_t discards, arbitrary<Gens...>&& arb) {
+  template <typename Arbitrary>
+  Arbitrary&& at_most(size_t discards, Arbitrary&& arb) {
     arb.at_most(discards);
-    return std::forward<arbitrary<Gens...>>(arb);
+    return std::forward<Arbitrary>(arb);
   }
 
-  template <typename... Gens>
-  arbitrary<Gens...>&& only_if(
-      const typename arbitrary<Gens...>::premise_t& p,
-      arbitrary<Gens...>&& arb)
+  template <typename Arbitrary>
+  Arbitrary&& only_if(const typename Arbitrary::premise_t& p,
+      Arbitrary&& arb)
   {
     arb.only_if(p);
-    return std::forward<arbitrary<Gens...>>(arb);
+    return std::forward<Arbitrary>(arb);
   }
 
-  template <typename... Gens>
-  arbitrary<Gens...>&& resize(const resizer_t& r, arbitrary<Gens...>&& arb) {
+  template <typename Arbitrary>
+  Arbitrary&& resize(const resizer_t& r, Arbitrary&& arb) {
     arb.resize(r);
-    return std::forward<arbitrary<Gens...>>(arb);
+    return std::forward<Arbitrary>(arb);
   }
 
   /* Factories. */
@@ -106,9 +105,9 @@ namespace autocheck {
     return arbitrary<Gens...>(gens...);
   }
 
-  template <typename... Types>
-  arbitrary<generator<Types...>> make_arbitrary() {
-    return arbitrary<generator<Types...>>(generator<Types>()...);
+  template <typename... Args>
+  arbitrary<generator<Args...>> make_arbitrary() {
+    return arbitrary<generator<Args...>>(generator<Args>()...);
   }
 
 }

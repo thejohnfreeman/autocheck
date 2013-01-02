@@ -13,14 +13,15 @@ namespace autocheck {
 
   template <
     typename... Args,
+    typename Predicate,
     typename Arbitrary = arbitrary<std::tuple<Args...>>
+    //, typename Classifier = classifier<Args...> // ICEs Clang
   >
-  /* Cannot be deduced... even if Args specified. */
-  //void check(size_t max_tests, const std::function<bool (Args...)>& pred,
-  void check(size_t max_tests, const typename predicate<Args...>::type& pred,
-      Arbitrary&& arb = make_arbitrary<Args...>(),
+  void check(size_t max_tests, const Predicate& pred,
+      Arbitrary&& arb = Arbitrary(),
       reporter&& rep = ostream_reporter(),
       classifier<Args...>&& cls = classifier<Args...>())
+      //Classifier&& cls = Classifier())
   {
     assert(max_tests > 0);
 
