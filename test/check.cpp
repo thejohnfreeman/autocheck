@@ -29,7 +29,7 @@ TEST(Check, Compiles) {
   ac::check<std::vector<int>>(100, reverse_prop,
       ac::make_arbitrary(ac::cons<std::vector<int>, unsigned int, int>()));
 
-  ac::check<std::vector<char>>(150, reverse_prop,
+  ac::check<std::vector<char>>(100, reverse_prop,
       ac::make_arbitrary(ac::list_of<char>()));
 }
 

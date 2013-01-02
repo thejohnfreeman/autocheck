@@ -47,6 +47,17 @@ namespace autocheck {
       }
   };
 
+  namespace detail {
+
+    static const char alnums[]  = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+      "abcdefghijklmnopqrstuvwxyz"
+      "0123456789";
+    /* Subtract 1 for NUL terminator. */
+    static const size_t nalnums = sizeof(alnums) - 1;
+    static const size_t nprint  = '~' - ' ' + 1;
+
+  }
+
   template <typename CharType>
   class generator<
     CharType,
@@ -59,16 +70,10 @@ namespace autocheck {
       typedef CharType result_type;
 
       result_type operator() (size_t size) {
-        static const char alnums[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-          "abcdefghijklmnopqrstuvwxyz"
-          "0123456789";
-        /* Subtract 1 for NUL terminator. */
-        static const size_t nalnums = sizeof(alnums) - 1;
-        static const size_t nprint  = '~' - ' ' + 1;
-        if (size < nalnums) {
-          size = nalnums - 1;
-        } else if (size < nprint) {
-          size = nprint - 1;
+        if (size < detail::nalnums) {
+          size = detail::nalnums - 1;
+        } else if (size < detail::nprint) {
+          size = detail::nprint - 1;
         } else {
           size = 255;
         }
@@ -76,8 +81,8 @@ namespace autocheck {
         std::uniform_int_distribution<int> dist(0, size);
         auto i = dist(rng());
         auto rv =
-          (size < nalnums) ? alnums[i] :
-          ((size < nprint) ? ' ' + i :
+          (size < detail::nalnums) ? detail::alnums[i] :
+          ((size < detail::nprint) ? ' ' + i :
            i);
         return rv;
       }
