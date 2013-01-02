@@ -48,6 +48,8 @@ TEST(Check, Compiles) {
 
   ac::check<std::vector<char>>(100, reverse_prop,
       ac::make_arbitrary(ac::list_of<char>()), copy(rep));
+  ac::check<std::vector<std::string>>(100, reverse_prop,
+      ac::make_arbitrary(ac::list_of<std::string>()), copy(rep));
 
   //std::function<bool (const std::string&)> print_prop =
     //[] (const std::string& x) { return !!(std::clog << x << std::endl); };
