@@ -31,5 +31,13 @@ TEST(Check, Compiles) {
 
   ac::check<std::vector<char>>(100, reverse_prop,
       ac::make_arbitrary(ac::list_of<char>()));
+
+  std::function<bool (const std::string&)> print_prop =
+    [] (const std::string& s) { return !!(std::clog << s << std::endl); };
+
+  ac::check<std::string>(100, print_prop,
+      ac::make_arbitrary<std::string>());
+  ac::check<std::string>(100, print_prop,
+      ac::make_arbitrary(ac::make_string_generator<ac::ccPrintable>()));
 }
 

@@ -80,7 +80,7 @@ namespace autocheck {
         fixed_size_generator(size_t size, const Gen& gen) :
           size(size), gen(gen) {}
 
-        result_type operator() () {
+        result_type operator() (size_t = 0) {
           return gen(size);
         }
     };

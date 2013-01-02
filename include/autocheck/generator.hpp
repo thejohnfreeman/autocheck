@@ -59,15 +59,21 @@ namespace autocheck {
 
   }
 
-  template <typename CharType>
+  enum CharCategory {
+    ccAlphaNumeric,
+    ccPrintable,
+    ccAny
+  };
+
+  template <typename CharType, CharCategory Category = ccAny>
   class char_generator {
     public:
       typedef CharType result_type;
 
       result_type operator() (size_t size) {
-        if (size < detail::nalnums) {
+        if (Category == ccAlphaNumeric || size < detail::nalnums) {
           size = detail::nalnums - 1;
-        } else if (size < detail::nprint) {
+        } else if (Category == ccPrintable || size < detail::nprint) {
           size = detail::nprint - 1;
         } else {
           size = std::numeric_limits<CharType>::max();
@@ -136,6 +142,46 @@ namespace autocheck {
       }
   };
 
+  template <typename CharGen = generator<char>>
+  class string_generator {
+    private:
+      CharGen chargen;
+
+    public:
+      string_generator(const CharGen& chargen = CharGen()) :
+        chargen(chargen) {}
+
+      typedef std::basic_string<typename CharGen::result_type> result_type;
+
+      result_type operator() (size_t size) {
+        result_type rv;
+        rv.reserve(size);
+        std::generate_n(std::back_insert_iterator<result_type>(rv), size,
+            /* Scale characters faster than string size. */
+            fix(size * 3, chargen));
+        return rv;
+      }
+  };
+
+  template <
+    CharCategory Category = ccAny,
+    typename CharType     = char
+  >
+  string_generator<char_generator<CharType, Category>>
+  make_string_generator() {
+    return string_generator<char_generator<CharType, Category>>();
+  }
+
+  template <typename CharGen>
+  string_generator<CharGen>
+  make_string_generator(const CharGen& chargen) {
+    return string_generator<CharGen>();
+  }
+
+  template <typename CharType>
+  class generator<std::basic_string<CharType>> :
+    public string_generator<generator<CharType>> {};
+
   /* TODO: Generic sequence generator. */
 
   template <typename T, typename Gen = generator<T>>
@@ -151,6 +197,7 @@ namespace autocheck {
 
       result_type operator() (size_t size) {
         result_type rv;
+        rv.reserve(size);
         std::generate_n(std::back_insert_iterator<result_type>(rv), size,
             fix(size, eltgen));
         return rv;
@@ -170,6 +217,7 @@ namespace autocheck {
   template <typename T, typename Gen = generator<T>>
   detail::mapped_generator<std::vector<T>, list_generator<T, Gen>>
   ordered_list(const Gen& gen = Gen()) {
+    /* This can be optimized if we care to. */
     return map<std::vector<T>>(
         [] (std::vector<T>&& a, size_t) {
           std::sort(a.begin(), a.end());
