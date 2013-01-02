@@ -158,7 +158,7 @@ namespace autocheck {
         rv.reserve(size);
         std::generate_n(std::back_insert_iterator<result_type>(rv), size,
             /* Scale characters faster than string size. */
-            fix(size * 3, chargen));
+            fix(size << 2, chargen));
         return rv;
       }
   };

@@ -21,7 +21,7 @@ namespace autocheck {
 
   template <typename... Args>
   struct predicate {
-    typedef std::function<bool (Args...)> type;
+    typedef std::function<bool (const Args&...)> type;
   };
 
   /* Type of functions that adjust size of generated value. */

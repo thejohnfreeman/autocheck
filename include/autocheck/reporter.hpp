@@ -18,7 +18,7 @@ namespace autocheck {
   };
 
   int round_percentage(size_t a, size_t b) {
-    return static_cast<int>(round(static_cast<float>(a) / b));
+    return static_cast<int>(ceil(100.0 * a / b));
   }
 
   void report_success(std::ostream& out, size_t tests, size_t max_tests,
@@ -31,7 +31,7 @@ namespace autocheck {
       assert(tests == max_tests);
       out << "OK, passed " << tests << " tests";
       if (trivial) {
-        out << "(" << round_percentage(trivial, max_tests) << "% trivial)";
+        out << " (" << round_percentage(trivial, max_tests) << "% trivial)";
       }
       out << "." << std::endl;
     }

@@ -44,7 +44,7 @@ namespace autocheck {
             tag += std::get<1>(tagger);
           }
         }
-        ++tags[tag];
+        if (!tag.empty()) ++tags[tag];
       }
 
       size_t trivial() const { return num_trivial; }

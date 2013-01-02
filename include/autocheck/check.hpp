@@ -19,7 +19,7 @@ namespace autocheck {
   //void check(size_t max_tests, const std::function<bool (Args...)>& pred,
   void check(size_t max_tests, const typename predicate<Args...>::type& pred,
       Arbitrary arb = make_arbitrary<Args...>(),
-      const reporter& rep = ostream_reporter(),
+      reporter&& rep = ostream_reporter(),
       classifier<Args...>&& cls = classifier<Args...>())
   {
     assert(max_tests > 0);
