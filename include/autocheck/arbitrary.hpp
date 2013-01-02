@@ -4,22 +4,12 @@
 #include <cassert>
 #include <cstdio>
 
+#include "function.hpp"
 #include "generator.hpp"
 #include "value.hpp"
 #include "apply.hpp"
 
 namespace autocheck {
-
-  /* Generic identity function. */
-  struct id {
-    template <typename T>
-    T&& operator() (T&& t) const { return std::forward<T>(t); }
-  };
-
-  struct always {
-    template <typename T>
-    bool operator() (const T& t) const { return true; }
-  };
 
   /* Arbitrary produces a finite sequence, always in a tuple, ready for
    * application, and counts discards. */

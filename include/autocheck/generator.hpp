@@ -7,7 +7,7 @@
 #include <limits>
 
 #include "is_one_of.hpp"
-#include "predicate.hpp"
+#include "function.hpp"
 #include "generator_combinators.hpp"
 #include "apply.hpp"
 

@@ -3,10 +3,11 @@
 
 #include <sstream>
 
-#include "predicate.hpp"
+#include "function.hpp"
 #include "arbitrary.hpp"
 #include "tuple.hpp"
 #include "reporter.hpp"
+#include "classifier.hpp"
 
 namespace autocheck {
 
@@ -18,7 +19,8 @@ namespace autocheck {
   //void check(size_t max_tests, const std::function<bool (Args...)>& pred,
   void check(size_t max_tests, const typename predicate<Args...>::type& pred,
       Arbitrary arb = make_arbitrary<Args...>(),
-      const reporter& report = ostream_reporter())
+      const reporter& rep = ostream_reporter(),
+      classifier<Args...>&& cls = classifier<Args...>())
   {
     assert(max_tests > 0);
 
@@ -28,15 +30,16 @@ namespace autocheck {
     value<args_t> args;
     while (arb(args) && (++tests != max_tests)) {
       //std::cout << "args = " << args << std::endl;
+      cls.check(args.cref());
       if (!apply(pred, args.cref())) {
         std::ostringstream reason;
         reason << std::boolalpha << args;
-        report.failure(tests, reason.str().c_str());
+        rep.failure(tests, reason.str().c_str());
         return;
       }
     }
 
-    report.success(tests, max_tests);
+    rep.success(tests, max_tests, cls.trivial(), cls.distro());
   }
 
 }
