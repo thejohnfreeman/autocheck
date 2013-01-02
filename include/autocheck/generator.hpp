@@ -47,6 +47,26 @@ namespace autocheck {
       }
   };
 
+  template <typename UnsignedIntegral>
+  class generator<
+    UnsignedIntegral,
+    typename std::enable_if<
+      is_one_of<UnsignedIntegral, unsigned short, unsigned int,
+        unsigned long, unsigned long long>::value
+    >::type
+  >
+  {
+    public:
+      typedef UnsignedIntegral result_type;
+
+      result_type operator() (size_t size) {
+        /* Distribution is non-static. */
+        std::uniform_int_distribution<UnsignedIntegral> dist(0, size);
+        auto rv = dist(rng());
+        return rv;
+      }
+  };
+
   template <typename SignedIntegral>
   class generator<
     SignedIntegral,
@@ -61,7 +81,8 @@ namespace autocheck {
       result_type operator() (size_t size) {
         /* Distribution is non-static. */
         std::uniform_int_distribution<SignedIntegral> dist(-size, size);
-        return dist(rng());
+        auto rv = dist(rng());
+        return rv;
       }
   };
 
@@ -90,6 +111,9 @@ namespace autocheck {
     return list_generator<T, Gen>(gen);
   }
 
+  template <typename T>
+  class generator<std::vector<T>> : public list_generator<T> {};
+
   /* TODO: Generic type generator (by construction). */
   template <typename T, typename... Gens>
   class cons_generator {
@@ -97,15 +121,28 @@ namespace autocheck {
       std::tuple<Gens...> gens;
 
     public:
+      cons_generator() :
+        gens(Gens()...) {}
+
       cons_generator(const Gens&... gens) :
         gens(gens...) {}
 
       typedef T result_type;
 
       result_type operator() (size_t size) {
-        return generate<result_type>(gens, size - 1);
+        return generate<result_type>(gens, (size > 0) ? (size - 1) : size);
       }
   };
+
+  template <typename T, typename... Gens>
+  cons_generator<T, Gens...> cons(const Gens&... gens) {
+    return cons_generator<T, Gens...>(gens...);
+  }
+
+  template <typename T, typename... Args>
+  cons_generator<T, generator<Args>...> cons() {
+    return cons_generator<T, generator<Args>...>();
+  }
 
 }
 
