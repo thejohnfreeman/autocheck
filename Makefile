@@ -20,9 +20,15 @@ INSTALLDIR := $(abspath $(INSTALLDIR))
 
 ## default target
 
-.PHONY : all
+.PHONY : all debug release
 
-all : test
+all : debug
+
+debug : CXXFLAGS += $(DEBUG_CXXFLAGS)
+debug : test
+
+release : CXXFLAGS += $(RELEASE_CXXFLAGS)
+release : test
 
 
 ## dependencies
@@ -45,13 +51,15 @@ dep_cxx = \
 
 CXX := clang++
 
-FLAGS += -I./include
-#FLAGS += -O2 -DNDEBUG
-FLAGS += -O0 -g3
+FLAGS         += -I./include
+RELEASE_FLAGS := -O2 -DNDEBUG
+DEBUG_FLAGS   := -O0 -g3
 
-CXXFLAGS += $(FLAGS)
-CXXFLAGS += -std=c++11
-CXXFLAGS += -stdlib=libc++ -U__STRICT_ANSI__
+CXXFLAGS         += $(FLAGS)
+CXXFLAGS         += -std=c++11
+CXXFLAGS         += -stdlib=libc++ -U__STRICT_ANSI__
+RELEASE_CXXFLAGS := $(RELEASE_FLAGS)
+DEBUG_CXXFLAGS   := $(DEBUG_FLAGS)
 
 LXXFLAGS += -stdlib=libc++ 
 
