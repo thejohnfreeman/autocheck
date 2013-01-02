@@ -47,6 +47,42 @@ namespace autocheck {
       }
   };
 
+  template <typename CharType>
+  class generator<
+    CharType,
+    typename std::enable_if<
+      is_one_of<CharType, unsigned char, char, signed char>::value
+    >::type
+  >
+  {
+    public:
+      typedef CharType result_type;
+
+      result_type operator() (size_t size) {
+        static const char alnums[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+          "abcdefghijklmnopqrstuvwxyz"
+          "0123456789";
+        /* Subtract 1 for NUL terminator. */
+        static const size_t nalnums = sizeof(alnums) - 1;
+        static const size_t nprint  = '~' - ' ' + 1;
+        if (size < nalnums) {
+          size = nalnums - 1;
+        } else if (size < nprint) {
+          size = nprint - 1;
+        } else {
+          size = 255;
+        }
+        /* Distribution is non-static. */
+        std::uniform_int_distribution<int> dist(0, size);
+        auto i = dist(rng());
+        auto rv =
+          (size < nalnums) ? alnums[i] :
+          ((size < nprint) ? ' ' + i :
+           i);
+        return rv;
+      }
+  };
+
   template <typename UnsignedIntegral>
   class generator<
     UnsignedIntegral,
@@ -87,6 +123,7 @@ namespace autocheck {
   };
 
   /* TODO: Generic sequence generator. */
+
   template <typename T, typename Gen = generator<T>>
   class list_generator {
     private:
@@ -114,6 +151,8 @@ namespace autocheck {
   template <typename T>
   class generator<std::vector<T>> : public list_generator<T> {};
 
+  /* Ordered list combinator. */
+
   template <typename T, typename Gen = generator<T>>
   detail::mapped_generator<std::vector<T>, list_generator<T, Gen>>
   ordered_list(const Gen& gen = Gen()) {
@@ -125,7 +164,8 @@ namespace autocheck {
         list_of<T>(gen));
   }
 
-  /* TODO: Generic type generator (by construction). */
+  /* Generic type generator (by construction). */
+
   template <typename T, typename... Gens>
   class cons_generator {
     private:
