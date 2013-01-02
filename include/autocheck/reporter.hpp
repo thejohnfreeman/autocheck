@@ -3,22 +3,47 @@
 
 #include <iostream>
 #include <sstream>
+#include <cmath>
+
+#include "distribution.hpp"
 
 namespace autocheck {
 
   class reporter {
     public:
-      virtual void success(size_t tests, size_t max_tests) const = 0;
+      virtual void success(size_t tests, size_t max_tests,
+          size_t trivial = 0,
+          distribution&& dist = distribution()) const = 0;
       virtual void failure(size_t tests, const char* reason) const = 0;
   };
 
-  void report_success(std::ostream& out, size_t tests, size_t max_tests) {
+  int round_percentage(size_t a, size_t b) {
+    return static_cast<int>(round(static_cast<float>(a) / b));
+  }
+
+  void report_success(std::ostream& out, size_t tests, size_t max_tests,
+      size_t trivial, distribution&& dist)
+  {
     if (tests < max_tests) {
       out << "Arguments exhausted after " << tests << " tests."
         << std::endl;
     } else {
       assert(tests == max_tests);
-      out << "OK, passed " << tests << " tests." << std::endl;
+      out << "OK, passed " << tests << " tests";
+      if (trivial) {
+        out << "(" << round_percentage(trivial, max_tests) << "% trivial)";
+      }
+      out << "." << std::endl;
+    }
+
+    /* Sort tags in descending order by size. */
+    std::sort(dist.begin(), dist.end(),
+        [] (const dist_tag& a, const dist_tag& b) {
+          return std::get<1>(a) > std::get<1>(b);
+        });
+    for (const dist_tag& tag : dist) {
+      out << round_percentage(std::get<1>(tag), max_tests) << "% "
+        << std::get<0>(tag) << "." << std::endl;
     }
   }
 
@@ -34,8 +59,10 @@ namespace autocheck {
     public:
       ostream_reporter(std::ostream& out = std::cout) : out(out) {}
 
-      virtual void success(size_t tests, size_t max_tests) const {
-        report_success(out, tests, max_tests);
+      virtual void success(size_t tests, size_t max_tests,
+          size_t trivial, distribution&& dist) const
+      {
+        report_success(out, tests, max_tests, trivial, std::move(dist));
       }
 
       virtual void failure(size_t tests, const char* reason) const {
@@ -47,10 +74,13 @@ namespace autocheck {
 
   class gtest_reporter : public reporter {
     public:
-      virtual void success(size_t tests, size_t max_tests) const {
-        report_success(std::clog, tests, max_tests);
+      virtual void success(size_t tests, size_t max_tests,
+          size_t trivial, distribution&& dist) const
+      {
+        report_success(std::clog, tests, max_tests, trivial, std::move(dist));
         ASSERT_TRUE(true);
       }
+
       virtual void failure(size_t tests, const char* reason) const {
         std::ostringstream out;
         report_failure(out, tests, reason);
