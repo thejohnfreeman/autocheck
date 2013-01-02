@@ -60,17 +60,17 @@ TEST(Check, Compiles) {
       //ac::make_arbitrary(ac::make_string_generator<ac::ccPrintable>()),
       //copy(rep));
 
-  /* Chaining... */
+  /* Chaining, ... */
   //auto arb = ac::make_arbitrary(ac::generator<int>(), ac::ordered_list<int>())
     //.only_if([] (int, const std::vector<int>& xs) -> bool { return std::is_sorted(xs.begin(), xs.end()); })
     //.at_most(100);
 
-  /* ..., or combinators. */
+  /* ... or combinators. */
   auto arb =
     ac::at_most(100,
         ac::only_if([] (int, const std::vector<int>& xs) -> bool { return std::is_sorted(xs.begin(), xs.end()); },
-          ac::make_arbitrary(ac::generator<int>(), ac::ordered_list<int>())));
-          //ac::make_arbitrary(ac::generator<int>(), ac::list_of<int>())));
+          //ac::make_arbitrary(ac::generator<int>(), ac::ordered_list<int>())));
+          ac::make_arbitrary(ac::generator<int>(), ac::list_of<int>())));
 
   ac::classifier<int, std::vector<int>> cls;
   cls.trivial([] (int, const std::vector<int>& xs) { return xs.empty(); });
