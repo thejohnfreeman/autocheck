@@ -184,7 +184,7 @@ namespace autocheck {
 
   /* TODO: Generic sequence generator. */
 
-  template <typename T, typename Gen = generator<T>>
+  template <typename Gen>
   class list_generator {
     private:
       Gen eltgen;
@@ -193,7 +193,7 @@ namespace autocheck {
       list_generator(const Gen& eltgen = Gen()) :
         eltgen(eltgen) {}
 
-      typedef std::vector<T> result_type;
+      typedef std::vector<typename Gen::result_type> result_type;
 
       result_type operator() (size_t size) {
         result_type rv;
@@ -204,9 +204,14 @@ namespace autocheck {
       }
   };
 
+  template <typename Gen>
+  list_generator<Gen> list_of(const Gen& gen) {
+    return list_generator<Gen>(gen);
+  }
+
   template <typename T, typename Gen = generator<T>>
-  list_generator<T, Gen> list_of(const Gen& gen = Gen()) {
-    return list_generator<T, Gen>(gen);
+  list_generator<Gen> list_of() {
+    return list_of(Gen());
   }
 
   template <typename T>
@@ -214,16 +219,28 @@ namespace autocheck {
 
   /* Ordered list combinator. */
 
+  namespace detail {
+
+    struct sorter {
+      template <typename T>
+      std::vector<T> operator() (std::vector<T>&& a, size_t) {
+        std::sort(a.begin(), a.end());
+        return std::move(a);
+      }
+    };
+
+  }
+
+  template <typename Gen>
+  detail::mapped_generator<detail::sorter, list_generator<Gen>>
+  ordered_list(const Gen& gen) {
+    return map(detail::sorter(), list_of(gen));
+  }
+
   template <typename T, typename Gen = generator<T>>
-  detail::mapped_generator<std::vector<T>, list_generator<T, Gen>>
-  ordered_list(const Gen& gen = Gen()) {
-    /* This can be optimized if we care to. */
-    return map<std::vector<T>>(
-        [] (std::vector<T>&& a, size_t) {
-          std::sort(a.begin(), a.end());
-          return std::move(a);
-        },
-        list_of<T>(gen));
+  detail::mapped_generator<detail::sorter, list_generator<Gen>>
+  ordered_list() {
+    return ordered_list(Gen());
   }
 
   /* Generic type generator (by construction). */

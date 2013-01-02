@@ -47,7 +47,7 @@ TEST(Check, Compiles) {
       copy(rep));
 
   ac::check<std::vector<char>>(100, reverse_prop,
-      ac::make_arbitrary(ac::list_of<char>()), copy(rep));
+      ac::make_arbitrary(ac::list_of(ac::generator<char>())), copy(rep));
   ac::check<std::vector<std::string>>(100, reverse_prop,
       ac::make_arbitrary(ac::list_of<std::string>()), copy(rep));
 

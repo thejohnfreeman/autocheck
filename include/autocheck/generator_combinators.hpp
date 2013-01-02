@@ -14,7 +14,7 @@ namespace autocheck {
       public:
         typedef
           typename std::result_of<
-            Func(typename Gen::result_type, size_t)
+            Func(typename Gen::result_type&&, size_t)
           >::type
           result_type;
 
