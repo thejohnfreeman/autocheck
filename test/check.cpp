@@ -68,33 +68,23 @@ TEST(Check, Compiles) {
   /* ... or combinators. */
   auto arb =
     ac::at_most(100,
-        ac::only_if([] (int, const std::vector<int>& xs) -> bool { return std::is_sorted(xs.begin(), xs.end()); },
-          //ac::make_arbitrary(ac::generator<int>(), ac::ordered_list<int>())));
-          ac::make_arbitrary(ac::generator<int>(), ac::list_of<int>())));
+    ac::only_if([] (int, const std::vector<int>& xs) -> bool { return std::is_sorted(xs.begin(), xs.end()); },
+    //ac::make_arbitrary(ac::generator<int>(), ac::ordered_list<int>())));
+    ac::make_arbitrary(ac::generator<int>(), ac::list_of<int>())));
 
   ac::classifier<int, std::vector<int>> cls;
   cls.trivial([] (int, const std::vector<int>& xs) { return xs.empty(); });
-  cls.classify(
-      [] (int x, const std::vector<int>& xs) -> std::string {
-        std::ostringstream out;
-        out << xs.size();
-        return out.str();
-      });
+  cls.collect([] (int x, const std::vector<int>& xs) { return xs.size(); });
   cls.classify([] (int x, const std::vector<int>& xs) { return xs.empty() || (x < xs.front()); }, "at-head");
-  cls.classify([] (int x, const std::vector<int>& xs) { return xs.empty() || (xs.front() < x); }, "at-tail");
+  cls.classify([] (int x, const std::vector<int>& xs) { return xs.empty() || (xs.back() < x); }, "at-tail");
 
   /* Can't use combinators here because it breaks template deduction (?). */
-  //auto cls =
+  //ac::classifier<int, std::vector<int>> cls(
     //ac::trivial([] (int, const std::vector<int>& xs) { return xs.empty(); },
-        //ac::classify(
-          //[] (int x, const std::vector<int>& xs) -> std::string {
-            //std::ostringstream out;
-            //out << xs.size();
-            //return out.str();
-          //},
-          //ac::classify([] (int x, const std::vector<int>& xs) { return xs.empty() || (x < xs.front()); }, "at-head",
-            //ac::classify([] (int x, const std::vector<int>& xs) { return xs.empty() || (xs.back() < x); }, "at-tail",
-              //ac::classifier<int, const std::vector<int>>()))));
+    //ac::collect([] (int x, const std::vector<int>& xs) { return xs.size(); },
+    //ac::classify([] (int x, const std::vector<int>& xs) { return xs.empty() || (x < xs.front()); }, "at-head",
+    //ac::classify([] (int x, const std::vector<int>& xs) { return xs.empty() || (xs.back() < x); }, "at-tail",
+    //ac::classifier<int, const std::vector<int>>()))));
 
   ac::check<int, std::vector<int>>(100,
       [] (int x, const std::vector<int>& xs) -> bool {

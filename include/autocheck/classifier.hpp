@@ -2,6 +2,7 @@
 #define AUTOCHECK_CLASSIFIER_HPP
 
 #include <unordered_map>
+#include <sstream>
 
 #include "function.hpp"
 #include "apply.hpp"
@@ -29,8 +30,27 @@ namespace autocheck {
         return *this;
       }
 
-      classifier& classify(const tagger_t& tagger) {
+      classifier& collect(const tagger_t& tagger) {
         taggers.push_back(tagger);
+        return *this;
+      }
+
+      template <
+        typename Func,
+        typename Enable = typename std::enable_if<
+          !std::is_convertible<
+            typename std::result_of<Func(const Args&...)>::type,
+            std::string
+          >::value
+        >::type
+      >
+      classifier& collect(const Func& func) {
+        taggers.push_back(
+            [=] (const Args&... args) -> std::string {
+              std::ostringstream ss;
+              ss << func(args...);
+              return ss.str();
+            });
         return *this;
       }
 
@@ -62,32 +82,32 @@ namespace autocheck {
       }
   };
 
-  template <typename... Args>
-  classifier<Args...>&& trivial(
-      const typename classifier<Args...>::pred_t& pred,
-      classifier<Args...>&& cls)
+  template <typename Classifier>
+  Classifier&& trivial( const typename Classifier::pred_t& pred,
+      Classifier&& cls)
   {
     cls.trivial(pred);
-    return std::forward<classifier<Args...>>(cls);
+    return std::forward<Classifier>(cls);
   }
 
-  template <typename... Args>
-  classifier<Args...>&& classify(
-      const typename classifier<Args...>::tagger_t& tagger,
-      classifier<Args...>&& cls)
+  template <typename Classifier>
+  Classifier&& collect(const typename Classifier::tagger_t& tagger,
+      Classifier&& cls)
   {
-    cls.classify(tagger);
-    return std::forward<classifier<Args...>>(cls);
+    cls.collect(tagger);
+    return std::forward<Classifier>(cls);
   }
 
-  template <typename... Args>
-  classifier<Args...>&& classify(
-      const typename classifier<Args...>::pred_t& pred,
+  /* Missing lexical casting collect combinator, but no need until the
+   * combinators can be used. */
+
+  template <typename Classifier>
+  Classifier&& classify(const typename Classifier::pred_t& pred,
       const std::string& label,
-      classifier<Args...>&& cls)
+      Classifier&& cls)
   {
     cls.classify(pred, label);
-    return std::forward<classifier<Args...>>(cls);
+    return std::forward<Classifier>(cls);
   }
 
 }

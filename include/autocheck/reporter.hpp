@@ -31,7 +31,7 @@ namespace autocheck {
       assert(tests == max_tests);
       out << "OK, passed " << tests << " tests";
       if (trivial) {
-        out << " (" << round_percentage(trivial, max_tests) << "% trivial)";
+        out << " (" << round_percentage(trivial, tests) << "% trivial)";
       }
       out << "." << std::endl;
     }
@@ -42,7 +42,7 @@ namespace autocheck {
           return std::get<1>(a) > std::get<1>(b);
         });
     for (const dist_tag& tag : dist) {
-      out << round_percentage(std::get<1>(tag), max_tests) << "% "
+      out << round_percentage(std::get<1>(tag), tests) << "% "
         << std::get<0>(tag) << "." << std::endl;
     }
   }
