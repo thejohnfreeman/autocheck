@@ -4,6 +4,7 @@
 #include <random>
 #include <vector>
 #include <iterator>
+#include <limits>
 
 #include "is_one_of.hpp"
 #include "predicate.hpp"
@@ -59,13 +60,7 @@ namespace autocheck {
   }
 
   template <typename CharType>
-  class generator<
-    CharType,
-    typename std::enable_if<
-      is_one_of<CharType, unsigned char, char, signed char>::value
-    >::type
-  >
-  {
+  class char_generator {
     public:
       typedef CharType result_type;
 
@@ -75,7 +70,7 @@ namespace autocheck {
         } else if (size < detail::nprint) {
           size = detail::nprint - 1;
         } else {
-          size = 255;
+          size = std::numeric_limits<CharType>::max();
         }
         /* Distribution is non-static. */
         std::uniform_int_distribution<int> dist(0, size);
@@ -87,6 +82,20 @@ namespace autocheck {
         return rv;
       }
   };
+
+  /* WARNING: wchar_t, char16_t, char32_t, and family are typedefs. They
+   * cannot be distinguished from regular (un)signed integrals, meaning we
+   * cannot provide a general `generator` for them with the special char
+   * consideration of size. If you want that consideration, use
+   * char_generator specifically. */
+
+  template <typename CharType>
+  class generator<
+    CharType,
+    typename std::enable_if<
+      is_one_of<CharType, unsigned char, char, signed char>::value
+    >::type
+  > : public char_generator<CharType> {};
 
   template <typename UnsignedIntegral>
   class generator<
