@@ -11,46 +11,54 @@ namespace autocheck {
   template <typename... Args>
   class classifier {
     public:
-      typedef typename predicate<Args...>::type pred_t;
-      typedef std::tuple<pred_t, std::string>   tagger_t;
+      typedef typename predicate<Args...>::type           pred_t;
+      typedef std::function<std::string (const Args&...)> tagger_t;
 
     private:
       pred_t                                  is_trivial;
       size_t                                  num_trivial;
       std::vector<tagger_t>                   taggers;
-      std::unordered_map<std::string, size_t> tags;
+      std::unordered_map<std::string, size_t> tag_cloud;
 
     public:
       classifier() :
-        is_trivial(never()), num_trivial(0), taggers(), tags() {}
+        is_trivial(never()), num_trivial(0), taggers(), tag_cloud() {}
 
       classifier& trivial(const pred_t& pred) {
         is_trivial = pred;
         return *this;
       }
 
+      classifier& classify(const tagger_t& tagger) {
+        taggers.push_back(tagger);
+        return *this;
+      }
+
       classifier& classify(const pred_t& pred, const std::string& label) {
-        taggers.push_back(tagger_t(pred, label));
+        taggers.push_back(
+            [=] (const Args&... args) {
+              return (pred(args...)) ? label : "";
+            });
         return *this;
       }
 
       void check(const std::tuple<Args...>& args) {
         if (apply(is_trivial, args)) ++num_trivial;
 
-        std::string tag;
+        std::string tags;
         for (tagger_t& tagger : taggers) {
-          if (apply(std::get<0>(tagger), args)) {
-            if (!tag.empty()) tag += ", ";
-            tag += std::get<1>(tagger);
-          }
+          std::string tag = apply(tagger, args);
+          if (tag.empty()) continue;
+          if (!tags.empty()) tags += ", ";
+          tags += tag;
         }
-        if (!tag.empty()) ++tags[tag];
+        if (!tags.empty()) ++tag_cloud[tags];
       }
 
       size_t trivial() const { return num_trivial; }
 
       distribution distro() const {
-        return distribution(tags.begin(), tags.end());
+        return distribution(tag_cloud.begin(), tag_cloud.end());
       }
   };
 
@@ -60,6 +68,15 @@ namespace autocheck {
       classifier<Args...>&& cls)
   {
     cls.trivial(pred);
+    return std::forward<classifier<Args...>>(cls);
+  }
+
+  template <typename... Args>
+  classifier<Args...>&& classify(
+      const typename classifier<Args...>::tagger_t& tagger,
+      classifier<Args...>&& cls)
+  {
+    cls.classify(tagger);
     return std::forward<classifier<Args...>>(cls);
   }
 

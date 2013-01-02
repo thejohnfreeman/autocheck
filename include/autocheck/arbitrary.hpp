@@ -33,9 +33,8 @@ namespace autocheck {
       resizer_t           resizer;
 
     public:
-      template <typename... Args>
-      arbitrary(const Args&... args) :
-        gens(args...),
+      arbitrary(const Gens&... gens) :
+        gens(gens...),
         is_finite(false), count(0), num_discards(0), max_discards(0),
         premise(always()), resizer(id())
       {}

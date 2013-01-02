@@ -18,7 +18,7 @@ namespace autocheck {
   /* Cannot be deduced... even if Args specified. */
   //void check(size_t max_tests, const std::function<bool (Args...)>& pred,
   void check(size_t max_tests, const typename predicate<Args...>::type& pred,
-      Arbitrary arb = make_arbitrary<Args...>(),
+      Arbitrary&& arb = make_arbitrary<Args...>(),
       reporter&& rep = ostream_reporter(),
       classifier<Args...>&& cls = classifier<Args...>())
   {
