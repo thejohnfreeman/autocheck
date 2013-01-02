@@ -1,26 +1,29 @@
 #ifndef AUTOCHECK_GENERATOR_COMBINATORS_HPP
 #define AUTOCHECK_GENERATOR_COMBINATORS_HPP
 
+#include <type_traits>
+
 namespace autocheck {
 
   namespace detail {
 
     /* Wrappers used by combinators. */
 
-    template <typename T, typename Gen>
+    template <typename Func, typename Gen>
     class mapped_generator {
       public:
-        typedef T
+        typedef
+          typename std::result_of<
+            Func(typename Gen::result_type, size_t)
+          >::type
           result_type;
-        typedef std::function<T (typename Gen::result_type&&, size_t)>
-          func_t;
 
       private:
-        func_t func;
-        Gen    gen;
+        Func func;
+        Gen  gen;
 
       public:
-        mapped_generator(const func_t& func, const Gen& gen) :
+        mapped_generator(const Func& func, const Gen& gen) :
           func(func), gen(gen) {}
 
         result_type operator() (size_t size = 0) {
@@ -28,18 +31,17 @@ namespace autocheck {
         }
     };
 
-    template <typename Gen>
+    template <typename Pred, typename Gen>
     class filtered_generator {
       public:
-        typedef typename Gen::result_type             result_type;
-        typedef typename predicate<result_type>::type pred_t;
+        typedef typename Gen::result_type result_type;
 
       private:
-        pred_t pred;
-        Gen    gen;
+        Pred pred;
+        Gen  gen;
 
       public:
-        filtered_generator(const pred_t& pred, const Gen& gen) :
+        filtered_generator(const Pred& pred, const Gen& gen) :
           pred(pred), gen(gen) {}
 
         result_type operator() (size_t size = 0) {
@@ -50,17 +52,17 @@ namespace autocheck {
         }
     };
 
-    template <typename Gen>
+    template <typename Resize, typename Gen>
     class resized_generator {
       public:
         typedef typename Gen::result_type result_type;
 
       private:
-        resizer_t resizer;
-        Gen       gen;
+        Resize resizer;
+        Gen    gen;
 
       public:
-        resized_generator(const resizer_t& resizer, const Gen& gen) :
+        resized_generator(const Resize& resizer, const Gen& gen) :
           resizer(resizer), gen(gen) {}
 
         result_type operator() (size_t size = 0) {
@@ -89,27 +91,23 @@ namespace autocheck {
 
   /* Generator combinators. */
 
-  template <typename T, typename Gen>
-  detail::mapped_generator<T, Gen> map(
-      const typename detail::mapped_generator<T, Gen>::func_t& func,
-      const Gen& gen)
-  {
-    return detail::mapped_generator<T, Gen>(func, gen);
+  template <typename Func, typename Gen>
+  detail::mapped_generator<Func, Gen> map(const Func& func, const Gen& gen) {
+    return detail::mapped_generator<Func, Gen>(func, gen);
   }
 
-  template <typename Gen>
-  detail::filtered_generator<Gen> such_that(
-      const typename detail::filtered_generator<Gen>::pred_t& pred,
+  template <typename Pred, typename Gen>
+  detail::filtered_generator<Pred, Gen> such_that(const Pred& pred,
       const Gen& gen)
   {
-    return detail::filtered_generator<Gen>(pred, gen);
+    return detail::filtered_generator<Pred, Gen>(pred, gen);
   }
 
-  template <typename Gen>
-  detail::resized_generator<Gen> resize(const resizer_t& resizer,
+  template <typename Resize, typename Gen>
+  detail::resized_generator<Resize, Gen> resize(const Resize& resizer,
       const Gen& gen)
   {
-    return detail::resized_generator<Gen>(resizer, gen);
+    return detail::resized_generator<Resize, Gen>(resizer, gen);
   }
 
   template <typename Gen>

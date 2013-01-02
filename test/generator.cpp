@@ -19,7 +19,7 @@ TEST(GeneratorBool, Generating) {
 }
 
 TEST(Generator, Map) {
-  auto gen = ac::map<int>([] (bool, size_t n) { return n; },
+  auto gen = ac::map([] (bool, size_t n) { return n; },
       ac::generator<bool>());
   std::clog << "sizeof(gen) = " << sizeof(gen) << std::endl;
 
@@ -52,7 +52,7 @@ TEST(Generator, Resize) {
 TEST(Generator, Composition) {
   const int factor = 2;
   auto gen = ac::resize([] (size_t size) { return size * factor; },
-      ac::map<int>([] (bool, size_t n) { return n; },
+      ac::map([] (bool, size_t n) { return n; },
         ac::generator<bool>()));
   std::clog << "sizeof(gen) = " << sizeof(gen) << std::endl;
 
