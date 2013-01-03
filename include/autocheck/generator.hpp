@@ -164,17 +164,15 @@ namespace autocheck {
   };
 
   template <
-    CharCategory Category = ccAny,
+    CharCategory Category = ccPrintable,
     typename CharType     = char
   >
-  string_generator<char_generator<CharType, Category>>
-  make_string_generator() {
+  string_generator<char_generator<CharType, Category>> string() {
     return string_generator<char_generator<CharType, Category>>();
   }
 
   template <typename CharGen>
-  string_generator<CharGen>
-  make_string_generator(const CharGen& chargen) {
+  string_generator<CharGen> string(const CharGen& chargen) {
     return string_generator<CharGen>();
   }
 

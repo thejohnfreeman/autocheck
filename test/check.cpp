@@ -6,9 +6,9 @@
 namespace ac = autocheck;
 
 struct reverse_prop_t {
-  template <typename T>
-  bool operator() (const std::vector<T>& xs) const {
-    std::vector<T> ys(xs);
+  template <typename Container>
+  bool operator() (const Container& xs) const {
+    Container ys(xs);
     std::reverse(ys.begin(), ys.end());
     std::reverse(ys.begin(), ys.end());
     return xs == ys;
@@ -34,8 +34,12 @@ TEST(Check, Compiles) {
 
   ac::check<bool>(100, [] (bool x) { return true; },
       ac::make_arbitrary<bool>(), copy(rep));
+
+  /* This tests that every signed integer is positive. It is intended to
+   * demonstrate failure behavior. */
   ac::check<int>(100, [] (int x) { return x >= 0; },
       ac::make_arbitrary<int>(), copy(rep));
+
   //ac::check<bool>(100, [] (bool x) { return true; }); // ICEs Clang
 
   reverse_prop_t reverse_prop;
@@ -51,14 +55,11 @@ TEST(Check, Compiles) {
   ac::check<std::vector<std::string>>(100, reverse_prop,
       ac::make_arbitrary(ac::list_of<std::string>()), copy(rep));
 
-  //std::function<bool (const std::string&)> print_prop =
-    //[] (const std::string& x) { return !!(std::clog << x << std::endl); };
-
-  //ac::check<std::string>(100, print_prop,
-      //ac::make_arbitrary<std::string>(), copy(rep));
-  //ac::check<std::string>(100, print_prop,
-      //ac::make_arbitrary(ac::make_string_generator<ac::ccPrintable>()),
-      //copy(rep));
+  ac::check<std::string>(100, reverse_prop,
+      ac::make_arbitrary<std::string>(), copy(rep));
+  ac::check<std::string>(100, reverse_prop,
+      ac::make_arbitrary(ac::string<>()),
+      copy(rep));
 
   /* Chaining, ... */
   //auto arb = ac::make_arbitrary(ac::generator<int>(), ac::ordered_list<int>())
