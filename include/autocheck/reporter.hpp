@@ -15,6 +15,7 @@ namespace autocheck {
           size_t trivial = 0,
           distribution&& dist = distribution()) const = 0;
       virtual void failure(size_t tests, const char* reason) const = 0;
+      virtual ~reporter() {}
   };
 
   int round_percentage(size_t a, size_t b) {

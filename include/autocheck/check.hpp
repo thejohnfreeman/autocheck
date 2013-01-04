@@ -19,7 +19,7 @@ namespace autocheck {
   >
   void check(size_t max_tests, const Predicate& pred,
       Arbitrary&& arb = Arbitrary(),
-      reporter&& rep = ostream_reporter(),
+      const reporter& rep = ostream_reporter(),
       classifier<Args...>&& cls = classifier<Args...>())
       //Classifier&& cls = Classifier())
   {

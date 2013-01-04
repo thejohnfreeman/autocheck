@@ -33,33 +33,33 @@ TEST(Check, Compiles) {
   ac::gtest_reporter rep;
 
   ac::check<bool>(100, [] (bool x) { return true; },
-      ac::make_arbitrary<bool>(), copy(rep));
+      ac::make_arbitrary<bool>(), rep);
 
   /* This tests that every signed integer is positive. It is intended to
    * demonstrate failure behavior. */
   ac::check<int>(100, [] (int x) { return x >= 0; },
-      ac::make_arbitrary<int>(), copy(rep));
+      ac::make_arbitrary<int>(), rep);
 
   //ac::check<bool>(100, [] (bool x) { return true; }); // ICEs Clang
 
   reverse_prop_t reverse_prop;
 
   ac::check<std::vector<int>>(100, reverse_prop,
-      ac::make_arbitrary(ac::list_of<int>()), copy(rep));
+      ac::make_arbitrary(ac::list_of<int>()), rep);
   ac::check<std::vector<int>>(100, reverse_prop,
       ac::make_arbitrary(ac::cons<std::vector<int>, unsigned int, int>()),
-      copy(rep));
+      rep);
 
   ac::check<std::vector<char>>(100, reverse_prop,
-      ac::make_arbitrary(ac::list_of(ac::generator<char>())), copy(rep));
+      ac::make_arbitrary(ac::list_of(ac::generator<char>())), rep);
   ac::check<std::vector<std::string>>(100, reverse_prop,
-      ac::make_arbitrary(ac::list_of<std::string>()), copy(rep));
+      ac::make_arbitrary(ac::list_of<std::string>()), rep);
 
   ac::check<std::string>(100, reverse_prop,
-      ac::make_arbitrary<std::string>(), copy(rep));
+      ac::make_arbitrary<std::string>(), rep);
   ac::check<std::string>(100, reverse_prop,
       ac::make_arbitrary(ac::string<>()),
-      copy(rep));
+      rep);
 
   /* Chaining, ... */
   //auto arb = ac::make_arbitrary(ac::generator<int>(), ac::ordered_list<int>())
@@ -93,6 +93,6 @@ TEST(Check, Compiles) {
         insert_sorted(x, ys);
         return std::is_sorted(ys.begin(), ys.end());
       },
-      copy(arb), copy(rep), copy(cls));
+      copy(arb), rep, copy(cls));
 }
 
