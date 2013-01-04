@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <gtest/gtest.h>
-#include <autocheck/check.hpp>
 #include <autocheck/sequence.hpp>
+#include <autocheck/check.hpp>
 
 namespace ac = autocheck;
 
@@ -32,32 +32,32 @@ T copy(const T& t) { return t; }
 TEST(Check, Compiles) {
   ac::gtest_reporter rep;
 
-  ac::check<bool>(100, [] (bool x) { return true; },
+  ac::check<bool>([] (bool x) { return true; }, 100,
       ac::make_arbitrary<bool>(), rep);
 
   /* This tests that every signed integer is positive. It is intended to
    * demonstrate failure behavior. */
-  ac::check<int>(100, [] (int x) { return x >= 0; },
+  ac::check<int>([] (int x) { return x >= 0; }, 100,
       ac::make_arbitrary<int>(), rep);
 
-  //ac::check<bool>(100, [] (bool x) { return true; }); // ICEs Clang
+  //ac::check<bool>([] (bool x) { return true; }); // ICEs Clang
 
   reverse_prop_t reverse_prop;
 
-  ac::check<std::vector<int>>(100, reverse_prop,
+  ac::check<std::vector<int>>(reverse_prop, 100,
       ac::make_arbitrary(ac::list_of<int>()), rep);
-  ac::check<std::vector<int>>(100, reverse_prop,
+  ac::check<std::vector<int>>(reverse_prop, 100,
       ac::make_arbitrary(ac::cons<std::vector<int>, unsigned int, int>()),
       rep);
 
-  ac::check<std::vector<char>>(100, reverse_prop,
+  ac::check<std::vector<char>>(reverse_prop, 100,
       ac::make_arbitrary(ac::list_of(ac::generator<char>())), rep);
-  ac::check<std::vector<std::string>>(100, reverse_prop,
+  ac::check<std::vector<std::string>>(reverse_prop, 100,
       ac::make_arbitrary(ac::list_of<std::string>()), rep);
 
-  ac::check<std::string>(100, reverse_prop,
+  ac::check<std::string>(reverse_prop, 100,
       ac::make_arbitrary<std::string>(), rep);
-  ac::check<std::string>(100, reverse_prop,
+  ac::check<std::string>(reverse_prop, 100,
       ac::make_arbitrary(ac::string<>()),
       rep);
 
@@ -71,7 +71,8 @@ TEST(Check, Compiles) {
     ac::at_most(100,
     ac::only_if([] (int, const std::vector<int>& xs) -> bool { return std::is_sorted(xs.begin(), xs.end()); },
     //ac::make_arbitrary(ac::generator<int>(), ac::ordered_list<int>())));
-    ac::make_arbitrary(ac::generator<int>(), ac::list_of<int>())));
+    ac::make_arbitrary<int, std::vector<int>>()));
+    //ac::make_arbitrary(ac::generator<int>(), ac::list_of<int>())));
 
   ac::classifier<int, std::vector<int>> cls;
   cls.trivial([] (int, const std::vector<int>& xs) { return xs.empty(); });
@@ -87,12 +88,11 @@ TEST(Check, Compiles) {
     //ac::classify([] (int x, const std::vector<int>& xs) { return xs.empty() || (xs.back() < x); }, "at-tail",
     //ac::classifier<int, const std::vector<int>>()))));
 
-  ac::check<int, std::vector<int>>(100,
-      [] (int x, const std::vector<int>& xs) -> bool {
-        std::vector<int> ys(xs);
-        insert_sorted(x, ys);
-        return std::is_sorted(ys.begin(), ys.end());
+  ac::check<int, std::vector<int>>(
+      [] (int x, std::vector<int>& xs) -> bool {
+        insert_sorted(x, xs);
+        return std::is_sorted(xs.begin(), xs.end());
       },
-      copy(arb), rep, copy(cls));
+      100, copy(arb), rep, copy(cls));
 }
 

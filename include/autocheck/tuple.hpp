@@ -6,20 +6,21 @@
 namespace autocheck {
   namespace detail {
 
-    template <size_t I, typename... Ts>
-    void print(std::ostream& out, const std::tuple<Ts...>& tup,
-        const std::integral_constant<size_t, I>&
-          = std::integral_constant<size_t, I>())
-    {
-      out << std::get<I>(tup);
-      out << ", ";
-    }
-
     template <typename... Ts>
     void print(std::ostream& out, const std::tuple<Ts...>& tup,
         const std::integral_constant<size_t, 0>&)
     {
       out << std::get<0>(tup);
+    }
+
+    template <size_t I, typename... Ts>
+    void print(std::ostream& out, const std::tuple<Ts...>& tup,
+        const std::integral_constant<size_t, I>&
+          = std::integral_constant<size_t, I>())
+    {
+      print(out, tup, std::integral_constant<size_t, I - 1>());
+      out << ", ";
+      out << std::get<I>(tup);
     }
 
   }

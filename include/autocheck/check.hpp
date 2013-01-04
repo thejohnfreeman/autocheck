@@ -14,10 +14,11 @@ namespace autocheck {
   template <
     typename... Args,
     typename Predicate,
-    typename Arbitrary = arbitrary<std::tuple<Args...>>
+    typename Arbitrary = arbitrary<generator<Args>...>
     //, typename Classifier = classifier<Args...> // ICEs Clang
   >
-  void check(size_t max_tests, Predicate pred,
+  void check(Predicate pred,
+      size_t max_tests = 100,
       Arbitrary&& arb = Arbitrary(),
       const reporter& rep = ostream_reporter(),
       classifier<Args...>&& cls = classifier<Args...>())

@@ -106,8 +106,8 @@ namespace autocheck {
   }
 
   template <typename... Args>
-  arbitrary<generator<Args...>> make_arbitrary() {
-    return arbitrary<generator<Args...>>(generator<Args>()...);
+  arbitrary<generator<Args>...> make_arbitrary() {
+    return arbitrary<generator<Args>...>(generator<Args>()...);
   }
 
 }

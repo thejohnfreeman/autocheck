@@ -1,7 +1,7 @@
 #include <iostream>
 #include <gtest/gtest.h>
-#include <autocheck/arbitrary.hpp>
 #include <autocheck/tuple.hpp>
+#include <autocheck/arbitrary.hpp>
 
 namespace ac = autocheck;
 
