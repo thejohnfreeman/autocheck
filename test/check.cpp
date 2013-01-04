@@ -7,10 +7,10 @@ namespace ac = autocheck;
 
 struct reverse_prop_t {
   template <typename Container>
-  bool operator() (const Container& xs) const {
+  bool operator() (Container& xs) const {
     Container ys(xs);
-    std::reverse(ys.begin(), ys.end());
-    std::reverse(ys.begin(), ys.end());
+    std::reverse(xs.begin(), xs.end());
+    std::reverse(xs.begin(), xs.end());
     return xs == ys;
   }
 };

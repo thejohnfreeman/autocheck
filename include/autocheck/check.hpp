@@ -17,7 +17,7 @@ namespace autocheck {
     typename Arbitrary = arbitrary<std::tuple<Args...>>
     //, typename Classifier = classifier<Args...> // ICEs Clang
   >
-  void check(size_t max_tests, const Predicate& pred,
+  void check(size_t max_tests, Predicate pred,
       Arbitrary&& arb = Arbitrary(),
       const reporter& rep = ostream_reporter(),
       classifier<Args...>&& cls = classifier<Args...>())
@@ -30,11 +30,13 @@ namespace autocheck {
     typedef std::tuple<Args...> args_t;
     value<args_t> args;
     while (arb(args) && (++tests != max_tests)) {
+      /* Get what we need from `args` before we let the user modify them. */
+      std::ostringstream reason;
+      reason << std::boolalpha << args;
       //std::cout << "args = " << args << std::endl;
+
       cls.check(args.cref());
-      if (!apply(pred, args.cref())) {
-        std::ostringstream reason;
-        reason << std::boolalpha << args;
+      if (!apply(pred, args.ref())) {
         rep.failure(tests, reason.str().c_str());
         return;
       }
