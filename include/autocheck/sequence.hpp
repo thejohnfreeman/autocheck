@@ -1,7 +1,9 @@
 #ifndef AUTOCHECK_SEQUENCE_HPP
 #define AUTOCHECK_SEQUENCE_HPP
 
-namespace std {
+#include "ostream.hpp"
+
+namespace autocheck {
 
   template <typename T>
   std::ostream& operator<< (std::ostream& out, const std::vector<T>& seq) {

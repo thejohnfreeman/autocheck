@@ -1,6 +1,8 @@
 #ifndef AUTOCHECK_TUPLE_HPP
 #define AUTOCHECK_TUPLE_HPP
 
+#include "ostream.hpp"
+
 namespace autocheck {
   namespace detail {
 
@@ -21,9 +23,6 @@ namespace autocheck {
     }
 
   }
-}
-
-namespace std {
 
   template <typename... Ts>
   std::ostream& operator<< (std::ostream& out, const std::tuple<Ts...>& tup) {

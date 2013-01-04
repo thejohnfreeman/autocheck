@@ -213,7 +213,7 @@ namespace autocheck {
   }
 
   template <typename T>
-  class generator<std::vector<T>> : public list_generator<T> {};
+  class generator<std::vector<T>> : public list_generator<generator<T>> {};
 
   /* Ordered list combinator. */
 
