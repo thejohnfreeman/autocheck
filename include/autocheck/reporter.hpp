@@ -40,7 +40,9 @@ namespace autocheck {
     /* Sort tags in descending order by size. */
     std::sort(dist.begin(), dist.end(),
         [] (const dist_tag& a, const dist_tag& b) {
-          return std::get<1>(a) > std::get<1>(b);
+          return (std::get<1>(a) == std::get<1>(b))
+          ? (std::get<0>(a) < std::get<0>(b))
+          : (std::get<1>(a) > std::get<1>(b));
         });
     for (const dist_tag& tag : dist) {
       out << round_percentage(std::get<1>(tag), tests) << "% "
