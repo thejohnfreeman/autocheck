@@ -24,8 +24,9 @@ namespace autocheck {
       size_t max_tests = 100,
       Arbitrary&& arb = Arbitrary(),
       const reporter& rep = ostream_reporter(),
-      classifier<Args...>&& cls = classifier<Args...>())
-      //Classifier&& cls = Classifier())
+      classifier<Args...>&& cls = classifier<Args...>(),
+      //Classifier&& cls = Classifier(),
+      bool verbose = false)
   {
     assert(max_tests > 0);
 
@@ -37,7 +38,9 @@ namespace autocheck {
       /* Get what we need from `args` before we let the user modify them. */
       std::ostringstream reason;
       reason << std::boolalpha << args;
-      //std::cout << "args = " << args << std::endl;
+      if (verbose) {
+        std::cout << reason.str() << std::endl;
+      }
 
       cls.check(args.cref());
       if (!apply(prop, args.ref())) {
