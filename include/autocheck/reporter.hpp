@@ -18,11 +18,11 @@ namespace autocheck {
       virtual ~reporter() {}
   };
 
-  int round_percentage(size_t a, size_t b) {
+  inline int round_percentage(size_t a, size_t b) {
     return static_cast<int>(ceil(100.0 * a / b));
   }
 
-  void report_success(std::ostream& out, size_t tests, size_t max_tests,
+  inline void report_success(std::ostream& out, size_t tests, size_t max_tests,
       size_t trivial, distribution&& dist)
   {
     if (tests < max_tests) {
@@ -50,7 +50,7 @@ namespace autocheck {
     }
   }
 
-  void report_failure(std::ostream& out, size_t tests, const char* reason) {
+  inline void report_failure(std::ostream& out, size_t tests, const char* reason) {
     out << "Falsifiable, after " << tests << " tests:" << std::endl
       << reason << std::endl;
   }
