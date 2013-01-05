@@ -26,9 +26,6 @@ void insert_sorted(const T& x, std::vector<T>& xs) {
   }
 }
 
-template <typename T>
-T copy(const T& t) { return t; }
-
 TEST(Check, Compiles) {
   ac::gtest_reporter rep;
 
@@ -63,13 +60,13 @@ TEST(Check, Compiles) {
 
   /* Chaining, ... */
   //auto arb = ac::make_arbitrary(ac::generator<int>(), ac::ordered_list<int>())
-    //.only_if([] (int, const std::vector<int>& xs) -> bool { return std::is_sorted(xs.begin(), xs.end()); })
-    //.at_most(100);
+    //.discard_if([] (int, const std::vector<int>& xs) -> bool { return !std::is_sorted(xs.begin(), xs.end()); })
+    //.discard_at_most(100);
 
   /* ... or combinators. */
   auto arb =
-    ac::at_most(100,
-    ac::only_if([] (int, const std::vector<int>& xs) -> bool { return std::is_sorted(xs.begin(), xs.end()); },
+    ac::discard_if([] (int, const std::vector<int>& xs) -> bool { return !std::is_sorted(xs.begin(), xs.end()); },
+    ac::discard_at_most(100,
     //ac::make_arbitrary(ac::generator<int>(), ac::ordered_list<int>())));
     ac::make_arbitrary<int, std::vector<int>>()));
     //ac::make_arbitrary(ac::generator<int>(), ac::list_of<int>())));
@@ -93,6 +90,6 @@ TEST(Check, Compiles) {
         insert_sorted(x, xs);
         return std::is_sorted(xs.begin(), xs.end());
       },
-      100, copy(arb), rep, copy(cls));
+      100, ac::copy(arb), rep, ac::copy(cls));
 }
 

@@ -21,33 +21,38 @@ namespace autocheck {
       typedef std::tuple<typename Gens::result_type...> result_type;
 
       typedef typename predicate<typename Gens::result_type...>::type
-        premise_t;
+        discard_t;
+      typedef std::function<void (typename Gens::result_type&...)>
+        prep_t;
 
     private:
       std::tuple<Gens...> gens;
-      bool                is_finite;
       size_t              count;
       size_t              num_discards;
       size_t              max_discards;
-      premise_t           premise;
-      resizer_t           resizer;
+      discard_t           discard_f;
+      resize_t            resize_f;
+      prep_t              prep_f;
 
     public:
       arbitrary(const Gens&... gens) :
         gens(gens...),
-        is_finite(false), count(0), num_discards(0), max_discards(0),
-        premise(always()), resizer(id())
+        count(0), num_discards(0), max_discards(500),
+        discard_f(), resize_f(id()), prep_f()
       {}
 
       bool operator() (value<result_type>& candidate) {
-        while (!is_finite || (num_discards < max_discards)) {
+        while (num_discards < max_discards) {
           /* Size starts at 0 and grows moderately. */
-          candidate = generate<result_type>(gens, resizer(count >> 1));
-          if (apply(premise, candidate.cref())) {
+          candidate = generate<result_type>(gens, resize_f(count >> 1));
+          if (prep_f) {
+            apply(prep_f, candidate.ref());
+          }
+          if (discard_f && apply(discard_f, candidate.cref())) {
+            ++num_discards;
+          } else {
             ++count;
             return true;
-          } else {
-            ++num_discards;
           }
         }
         return false;
@@ -58,20 +63,24 @@ namespace autocheck {
         count        = 0;
       }
 
-      arbitrary& at_most(size_t discards) {
+      arbitrary& resize(const resize_t& r) {
+        resize_f = r;
+        return *this;
+      }
+
+      arbitrary& prep(const prep_t& p) {
+        prep_f = p;
+        return *this;
+      }
+
+      arbitrary& discard_if(const discard_t& d) {
+        discard_f = d;
+        return *this;
+      }
+
+      arbitrary& discard_at_most(size_t discards) {
         assert(discards > 0);
-        is_finite    = true;
         max_discards = discards;
-        return *this;
-      }
-
-      arbitrary& only_if(const premise_t& p) {
-        premise = p;
-        return *this;
-      }
-
-      arbitrary& resize(const resizer_t& r) {
-        resizer = r;
         return *this;
       }
   };
@@ -79,22 +88,28 @@ namespace autocheck {
   /* Combinators. */
 
   template <typename Arbitrary>
-  Arbitrary&& at_most(size_t discards, Arbitrary&& arb) {
-    arb.at_most(discards);
+  Arbitrary&& resize(const resize_t& r, Arbitrary&& arb) {
+    arb.resize(r);
     return std::forward<Arbitrary>(arb);
   }
 
   template <typename Arbitrary>
-  Arbitrary&& only_if(const typename Arbitrary::premise_t& p,
+  Arbitrary&& prep(const typename Arbitrary::prep_t& p, Arbitrary&& arb) {
+    arb.prep(p);
+    return std::forward<Arbitrary>(arb);
+  }
+
+  template <typename Arbitrary>
+  Arbitrary&& discard_if(const typename Arbitrary::discard_t& d,
       Arbitrary&& arb)
   {
-    arb.only_if(p);
+    arb.discard_if(d);
     return std::forward<Arbitrary>(arb);
   }
 
   template <typename Arbitrary>
-  Arbitrary&& resize(const resizer_t& r, Arbitrary&& arb) {
-    arb.resize(r);
+  Arbitrary&& discard_at_most(size_t discards, Arbitrary&& arb) {
+    arb.discard_at_most(discards);
     return std::forward<Arbitrary>(arb);
   }
 

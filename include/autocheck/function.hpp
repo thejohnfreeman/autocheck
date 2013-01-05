@@ -25,7 +25,7 @@ namespace autocheck {
   };
 
   /* Type of functions that adjust size of generated value. */
-  typedef std::function<size_t (size_t)> resizer_t;
+  typedef std::function<size_t (size_t)> resize_t;
 
 }
 

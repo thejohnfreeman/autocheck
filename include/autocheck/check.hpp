@@ -11,13 +11,16 @@
 
 namespace autocheck {
 
+  template <typename T>
+  T copy(const T& t) { return t; }
+
   template <
     typename... Args,
-    typename Predicate,
+    typename Property,
     typename Arbitrary = arbitrary<generator<Args>...>
     //, typename Classifier = classifier<Args...> // ICEs Clang
   >
-  void check(Predicate pred,
+  void check(Property prop,
       size_t max_tests = 100,
       Arbitrary&& arb = Arbitrary(),
       const reporter& rep = ostream_reporter(),
@@ -37,7 +40,7 @@ namespace autocheck {
       //std::cout << "args = " << args << std::endl;
 
       cls.check(args.cref());
-      if (!apply(pred, args.ref())) {
+      if (!apply(prop, args.ref())) {
         rep.failure(tests, reason.str().c_str());
         return;
       }
