@@ -28,10 +28,11 @@ struct bad_prop_reverse_t {
 };
 
 int main() {
-  //ac::check<std::vector<int>>(prop_reverse_t());
-  ac::check<std::vector<int>>(prop_reverse_t(), 100, ac::make_arbitrary<std::vector<int>>());
+  ac::check<std::vector<int>>(prop_reverse_t());
 
-  ac::check<std::vector<int>>(bad_prop_reverse_t(), 100, ac::make_arbitrary<std::vector<int>>());
+  ac::check<std::vector<int>>(prop_reverse_t(), 300);
+
+  ac::check<std::vector<int>>(bad_prop_reverse_t());
 
   return 0;
 }
