@@ -14,7 +14,7 @@
 namespace autocheck {
 
   /* Reusable static standard random number generator. */
-  static std::mt19937& rng() {
+  inline std::mt19937& rng() {
     static std::random_device rd;
     static std::mt19937 rng(rd());
     return rng;

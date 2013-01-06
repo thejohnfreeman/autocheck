@@ -35,6 +35,8 @@ namespace autocheck {
       prep_t              prep_f;
 
     public:
+      arbitrary() : arbitrary(Gens()...) {}
+
       arbitrary(const Gens&... gens) :
         gens(gens...),
         count(0), num_discards(0), max_discards(500),

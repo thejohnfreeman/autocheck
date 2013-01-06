@@ -14,15 +14,17 @@ namespace autocheck {
   template <typename T>
   T copy(const T& t) { return t; }
 
+  /* Have to split defaults between two functions because of Clang ICE. */
+
   template <
     typename... Args,
     typename Property,
-    typename Arbitrary = arbitrary<generator<Args>...>
+    typename Arbitrary
     //, typename Classifier = classifier<Args...> // ICEs Clang
   >
   void check(Property prop,
-      size_t max_tests = 100,
-      Arbitrary&& arb = Arbitrary(),
+      size_t max_tests,
+      Arbitrary&& arb,
       const reporter& rep = ostream_reporter(),
       classifier<Args...>&& cls = classifier<Args...>(),
       //Classifier&& cls = Classifier(),
@@ -50,6 +52,16 @@ namespace autocheck {
     }
 
     rep.success(tests, max_tests, cls.trivial(), cls.distro());
+  }
+
+  template <typename... Args, typename Property>
+  void check(Property prop, size_t max_tests = 100) {
+    check<Args...>(std::move(prop),
+        max_tests,
+        arbitrary<generator<Args>...>(),
+        ostream_reporter(),
+        classifier<Args...>(),
+        false);
   }
 
 }

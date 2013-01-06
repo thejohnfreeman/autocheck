@@ -37,7 +37,7 @@ TEST(Check, Compiles) {
   ac::check<int>([] (int x) { return x >= 0; }, 100,
       ac::make_arbitrary<int>(), rep);
 
-  //ac::check<bool>([] (bool x) { return true; }); // ICEs Clang
+  ac::check<bool>([] (bool x) { return true; });
 
   reverse_prop_t reverse_prop;
 
