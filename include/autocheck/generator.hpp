@@ -65,7 +65,7 @@ namespace autocheck {
     ccAny
   };
 
-  template <typename CharType, CharCategory Category = ccAny>
+  template <typename CharType, CharCategory Category = ccPrintable>
   class char_generator {
     public:
       typedef CharType result_type;
