@@ -223,7 +223,7 @@ namespace autocheck {
       template <typename T>
       std::vector<T> operator() (std::vector<T>&& a, size_t) {
         std::sort(a.begin(), a.end());
-        return std::move(a);
+        return a;
       }
     };
 

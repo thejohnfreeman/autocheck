@@ -9,8 +9,7 @@ namespace autocheck {
   std::ostream& operator<< (std::ostream& out, const std::vector<T>& seq) {
     out << "[";
     bool first = true;
-    typedef typename std::vector<T>::const_iterator iterator_t;
-    for (iterator_t b = seq.begin(), e = seq.end(); b != e; ++b) {
+    for (auto b = seq.begin(), e = seq.end(); b != e; ++b) {
       if (first) {
         first = false;
       } else {
