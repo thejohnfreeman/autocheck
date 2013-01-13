@@ -24,10 +24,10 @@ namespace autocheck {
   >
   void check(Property prop,
       size_t max_tests,
-      Arbitrary&& arb,
+      Arbitrary arb,
       const reporter& rep = ostream_reporter(),
-      classifier<Args...>&& cls = classifier<Args...>(),
-      //Classifier&& cls = Classifier(),
+      classifier<Args...> cls = classifier<Args...>(),
+      //Classifier cls = Classifier(),
       bool verbose = false)
   {
     assert(max_tests > 0);
