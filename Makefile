@@ -17,7 +17,26 @@ TESTS := \
 INSTALLDIR := bin
 INSTALLDIR := $(abspath $(INSTALLDIR))
 
-INCPATHS := ./include
+INCPATHS := $(HOME)/include ./include
+LIBPATHS := $(HOME)/lib
+
+
+## compiler
+
+CXX := clang++
+
+FLAGS         += $(foreach INCPATH, $(INCPATHS), -I$(INCPATH))
+RELEASE_FLAGS := -O2 -DNDEBUG
+DEBUG_FLAGS   := -O0 -g3
+
+CXXFLAGS         += $(FLAGS)
+CXXFLAGS         += -std=c++11
+CXXFLAGS         += -stdlib=libc++ -U__STRICT_ANSI__
+RELEASE_CXXFLAGS := $(RELEASE_FLAGS)
+DEBUG_CXXFLAGS   := $(DEBUG_FLAGS)
+
+LXXFLAGS += $(foreach LIBPATH, $(LIBPATHS), -L$(LIBPATH)) -stdlib=libc++ 
+
 
 ## default target
 
@@ -48,23 +67,6 @@ dep_cxx = \
 	    > $$DEP.tmp && mv $$DEP.tmp $$DEP
 
 
-## compiler
-
-CXX := clang++
-
-FLAGS         += $(foreach INCPATH, $(INCPATHS), -I$(INCPATH))
-RELEASE_FLAGS := -O2 -DNDEBUG
-DEBUG_FLAGS   := -O0 -g3
-
-CXXFLAGS         += $(FLAGS)
-CXXFLAGS         += -std=c++11
-CXXFLAGS         += -stdlib=libc++ -U__STRICT_ANSI__
-RELEASE_CXXFLAGS := $(RELEASE_FLAGS)
-DEBUG_CXXFLAGS   := $(DEBUG_FLAGS)
-
-LXXFLAGS += -stdlib=libc++ 
-
-
 ## library
 
 $(OBJECTS) : $(OBJDIR)/$(SRCDIR)/%.o : $(SRCDIR)/%.cpp
@@ -75,12 +77,7 @@ $(OBJECTS) : $(OBJDIR)/$(SRCDIR)/%.o : $(SRCDIR)/%.cpp
 
 ## tests
 
-GTEST_SRCDIR := $(HOME)/work/googletest/source
-GTEST_LIBDIR := $(HOME)/work/googletest/build
-
 TESTOBJECTS  := $(TESTS:%=$(OBJDIR)/$(TESTDIR)/%.o)
-TESTCXXFLAGS := -I$(GTEST_SRCDIR)/include
-TESTLXXFLAGS := -L$(GTEST_LIBDIR) -lgtest -lgtest_main
 
 .PHONY : test verbose
 
@@ -90,14 +87,15 @@ verbose : $(INSTALLDIR)/test
 test : $(INSTALLDIR)/test
 	$(INSTALLDIR)/test 2>/dev/null
 
+$(INSTALLDIR)/test : LXXFLAGS += -lgtest -lgtest_main
 $(INSTALLDIR)/test : $(TESTOBJECTS) $(OBJECTS)
 	@mkdir -p $(dir $@)
-	$(CXX) $(LXXFLAGS) $(TESTLXXFLAGS) -o $@ $^
+	$(CXX) $(LXXFLAGS) -o $@ $^
 
 $(TESTOBJECTS) : $(OBJDIR)/$(TESTDIR)/%.o : $(TESTDIR)/%.cpp
 	@mkdir -p $(dir $@)
 	@$(call dep_cxx,$@,$<,$(TESTCXXFLAGS))
-	$(CXX) $(CXXFLAGS) $(TESTCXXFLAGS) -o $@ -c $<
+	$(CXX) $(CXXFLAGS) -o $@ -c $<
 
 
 ## debug
