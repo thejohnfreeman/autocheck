@@ -1,24 +1,26 @@
 #ifndef AUTOCHECK_VALUE_HPP
 #define AUTOCHECK_VALUE_HPP
 
-#include <cstdio>
-
-#include <autocheck/largest.hpp>
+#include <cassert>
 
 namespace autocheck {
 
   template <typename T>
   class value {
     private:
-      char buffer[largest<T, T*>::size];
       enum {
         None,
         Static,
         Heap
-      }    allocation;
+      }    allocation = None;
+
+      union {
+        T* pointer = nullptr;
+        T  object;
+      };
 
     public:
-      value() : allocation(None) {}
+      value() {}
 
       value(const value& copy) { *this = copy; }
 
@@ -26,9 +28,9 @@ namespace autocheck {
         if (this == &rhs) return *this;
 
         if (rhs.allocation == Static) {
-          construct(static_cast<const T&>(rhs));
+          construct(rhs.cref());
         } else if (rhs.allocation == Heap) {
-          ptr(new T(static_cast<const T&>(rhs)));
+          ptr(new T(rhs.cref()));
         }
 
         return *this;
@@ -49,23 +51,22 @@ namespace autocheck {
       template <typename... Args>
       void construct(const Args&... args) {
         clear();
-        T* p = new (buffer) T(args...);
+        T* p = new (&object) T(args...);
+        assert(p == &object);
         allocation = Static;
       }
 
       const T* ptr() const {
-        return (allocation == Heap)
-          ? (*reinterpret_cast<const T* const *>(buffer))
-          : (reinterpret_cast<const T*>(buffer));
+        return (allocation == Heap) ? pointer : &object;
       }
 
       T* ptr() {
-        return const_cast<T*>(static_cast<const value*>(this)->ptr());
+        return (allocation == Heap) ? pointer : &object;
       }
 
       void ptr(T* p) {
         clear();
-        (*reinterpret_cast<T**>(buffer)) = p;
+        pointer    = p;
         allocation = p ? Heap : None;
       }
 
