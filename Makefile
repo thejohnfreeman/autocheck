@@ -11,6 +11,7 @@ TESTS := \
 	value \
 	apply \
 	generator \
+	generator_combinators \
 	arbitrary \
 	check \
 

@@ -71,7 +71,7 @@ namespace autocheck {
     public:
       typedef CharType result_type;
 
-      result_type operator() (size_t size) {
+      result_type operator() (size_t size = 0) {
         if (Category == ccAlphaNumeric || size < detail::nalnums) {
           size = detail::nalnums - 1;
         } else if (Category == ccPrintable || size < detail::nprint) {
@@ -116,7 +116,7 @@ namespace autocheck {
     public:
       typedef UnsignedIntegral result_type;
 
-      result_type operator() (size_t size) {
+      result_type operator() (size_t size = 0) {
         /* Distribution is non-static. */
         std::uniform_int_distribution<UnsignedIntegral> dist(0, size);
         auto rv = dist(rng());
@@ -135,9 +135,28 @@ namespace autocheck {
     public:
       typedef SignedIntegral result_type;
 
-      result_type operator() (size_t size) {
+      result_type operator() (size_t size = 0) {
         /* Distribution is non-static. */
         std::uniform_int_distribution<SignedIntegral> dist(-size, size);
+        auto rv = dist(rng());
+        return rv;
+      }
+  };
+
+  template <typename Floating>
+  class generator<
+    Floating,
+    typename std::enable_if<
+      is_one_of<Floating, float, double>::value
+    >::type
+  >
+  {
+    public:
+      typedef Floating result_type;
+
+      result_type operator() (size_t size = 0) {
+        /* Distribution is non-static. */
+        std::uniform_real_distribution<Floating> dist(-size, size);
         auto rv = dist(rng());
         return rv;
       }
@@ -154,7 +173,7 @@ namespace autocheck {
 
       typedef std::basic_string<typename CharGen::result_type> result_type;
 
-      result_type operator() (size_t size) {
+      result_type operator() (size_t size = 0) {
         result_type rv;
         rv.reserve(size);
         std::generate_n(std::back_insert_iterator<result_type>(rv), size,
@@ -194,7 +213,7 @@ namespace autocheck {
 
       typedef std::vector<typename Gen::result_type> result_type;
 
-      result_type operator() (size_t size) {
+      result_type operator() (size_t size = 0) {
         result_type rv;
         rv.reserve(size);
         std::generate_n(std::back_insert_iterator<result_type>(rv), size,
@@ -258,7 +277,7 @@ namespace autocheck {
 
       typedef T result_type;
 
-      result_type operator() (size_t size) {
+      result_type operator() (size_t size = 0) {
         return generate<result_type>(gens, (size > 0) ? (size - 1) : size);
       }
   };

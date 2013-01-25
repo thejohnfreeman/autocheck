@@ -1,64 +1,53 @@
 #include <iostream>
 #include <gtest/gtest.h>
 #include <autocheck/generator.hpp>
+#include <autocheck/sequence.hpp>
 
 namespace ac = autocheck;
 
 static const size_t limit = 10;
 
-TEST(GeneratorBool, Generating) {
-  auto gen = ac::generator<bool>();
+template <typename T>
+void generate() {
+  auto gen = ac::generator<T>();
   std::clog << "sizeof(gen) = " << sizeof(gen) << std::endl;
 
   std::clog << std::boolalpha;
   for (int i = 0; i < limit; ++i) {
     if (i > 0) std::clog << ", ";
-    std::clog << gen();
+    using namespace autocheck;
+    std::clog << gen(i);
   }
   std::clog << std::endl;
 }
 
-TEST(Generator, Map) {
-  auto gen = ac::map([] (bool, size_t n) { return n; },
-      ac::generator<bool>());
-  std::clog << "sizeof(gen) = " << sizeof(gen) << std::endl;
-
-  const int n = 42;
-  for (int i = 0; i < limit; ++i) {
-    ASSERT_EQ(n, gen(n));
+#define TEST_GENERATOR(name, type)\
+  TEST(Generator, name) {\
+    generate<type>();\
   }
-}
 
-TEST(Generator, SuchThat) {
-  auto gen = ac::such_that([] (bool b) { return b; },
-      ac::generator<bool>());
-  std::clog << "sizeof(gen) = " << sizeof(gen) << std::endl;
+TEST_GENERATOR(Bool, bool);
 
-  for (int i = 0; i < limit; ++i) {
-    ASSERT_TRUE(gen());
-  }
-}
+TEST_GENERATOR(Char,         char);
+TEST_GENERATOR(SignedChar,   signed char);
+TEST_GENERATOR(UnsignedChar, unsigned char);
 
-TEST(Generator, Resize) {
-  auto gen = ac::resize([] (size_t size) { return size * 2; },
-      ac::generator<bool>());
-  std::clog << "sizeof(gen) = " << sizeof(gen) << std::endl;
+TEST_GENERATOR(Short,         short);
+TEST_GENERATOR(SignedShort,   signed short);
+TEST_GENERATOR(UnsignedShort, unsigned short);
 
-  for (int i = 0; i < limit; ++i) {
-    gen();
-  }
-}
+TEST_GENERATOR(Int,         int);
+TEST_GENERATOR(SignedInt,   signed int);
+TEST_GENERATOR(UnsignedInt, unsigned int);
 
-TEST(Generator, Composition) {
-  const int factor = 2;
-  auto gen = ac::resize([] (size_t size) { return size * factor; },
-      ac::map([] (bool, size_t n) { return n; },
-      ac::generator<bool>()));
-  std::clog << "sizeof(gen) = " << sizeof(gen) << std::endl;
+TEST_GENERATOR(Long,         long);
+TEST_GENERATOR(SignedLong,   signed long);
+TEST_GENERATOR(UnsignedLong, unsigned long);
 
-  const int n = 42;
-  for (int i = 0; i < limit; ++i) {
-    ASSERT_EQ(n * factor, gen(n));
-  }
-}
+TEST_GENERATOR(Float,  float);
+TEST_GENERATOR(Double, double);
+
+TEST_GENERATOR(String, std::string);
+
+TEST_GENERATOR(VectorOfInt, std::vector<int>);
 
