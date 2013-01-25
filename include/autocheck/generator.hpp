@@ -21,7 +21,7 @@ namespace autocheck {
     return rng;
   }
 
-  template <typename T, typename... Gens, int... Is>
+  template <typename T, typename... Gens, size_t... Is>
   T generate(std::tuple<Gens...>& gens, size_t size,
       const range<0, Is...>&)
   {
