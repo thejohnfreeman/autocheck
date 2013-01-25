@@ -6,13 +6,14 @@
 
 namespace autocheck {
 
+  /* To extend for more fixed-size containers, just overload result_of_apply,
+   * std::tuple_size, and std::get. */
+
   template <int N, int... Is>
   struct range : range<N - 1, N - 1, Is...> {};
 
   template <int... Is>
   struct range<0, Is...> {};
-
-  /* Const version. */
 
   template <typename F, typename Tuple>
   struct result_of_apply {};
@@ -23,9 +24,6 @@ namespace autocheck {
   };
 
   template <typename F, typename Tuple>
-  /* Cannot put const in the parameter list here for some reason. Breaks in
-   * GCC 4.7.2 and Clang 3.2. Works in Clang 3.3. Doesn't seem right, but
-   * we'll do it this way for now. */
   typename result_of_apply<F, typename std::decay<Tuple>::type>::type
   apply(F f, Tuple&& args) {
     return subapply(f,
