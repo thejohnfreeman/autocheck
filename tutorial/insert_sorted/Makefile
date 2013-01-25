@@ -11,7 +11,7 @@ INSTALLDIR := $(abspath $(INSTALLDIR))
 EXE := insert_sorted
 EXE := $(INSTALLDIR)/$(EXE)
 
-INCPATHS := $(HOME)/local/include
+INCPATHS := $(HOME)/include
 
 LIBPATHS :=
 LIBS :=

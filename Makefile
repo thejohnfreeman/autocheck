@@ -35,7 +35,8 @@ CXXFLAGS         += -stdlib=libc++ -U__STRICT_ANSI__
 RELEASE_CXXFLAGS := $(RELEASE_FLAGS)
 DEBUG_CXXFLAGS   := $(DEBUG_FLAGS)
 
-LXXFLAGS += $(foreach LIBPATH, $(LIBPATHS), -L$(LIBPATH)) -stdlib=libc++ 
+LXXFLAGS += -stdlib=libc++
+LXXFLAGS += $(foreach LIBPATH, $(LIBPATHS), -L$(LIBPATH))
 
 
 ## default target

@@ -11,7 +11,7 @@ INSTALLDIR := $(abspath $(INSTALLDIR))
 EXE := reverse
 EXE := $(INSTALLDIR)/$(EXE)
 
-INCPATHS := $(HOME)/local/include
+INCPATHS := $(HOME)/include
 
 LIBPATHS :=
 LIBS :=
