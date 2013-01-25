@@ -1,6 +1,9 @@
 #ifndef AUTOCHECK_APPLY_HPP
 #define AUTOCHECK_APPLY_HPP
 
+#include <type_traits>
+#include <tuple>
+
 namespace autocheck {
 
   template <int N, int... Is>
@@ -11,33 +14,29 @@ namespace autocheck {
 
   /* Const version. */
 
+  template <typename F, typename Tuple>
+  struct result_of_apply {};
+
   template <typename F, typename... Args>
+  struct result_of_apply<F, std::tuple<Args...>> {
+    typedef typename std::result_of<F(Args&...)>::type type;
+  };
+
+  template <typename F, typename Tuple>
   /* Cannot put const in the parameter list here for some reason. Breaks in
    * GCC 4.7.2 and Clang 3.2. Works in Clang 3.3. Doesn't seem right, but
    * we'll do it this way for now. */
-  typename std::result_of<F(Args&...)>::type
-  apply(F f, const std::tuple<Args...>& args) {
-    return subapply(f, args, range<sizeof...(Args)>());
+  typename result_of_apply<F, typename std::decay<Tuple>::type>::type
+  apply(F f, Tuple&& args) {
+    return subapply(f,
+        std::forward<Tuple>(args),
+        range<std::tuple_size<typename std::decay<Tuple>::type>::value>());
   }
 
-  template <typename F, typename... Args, int... Is>
-  typename std::result_of<F(Args&...)>::type
-  subapply(F f, const std::tuple<Args...>& args, const range<0, Is...>&) {
-    return f(std::get<Is>(args)...);
-  }
-
-  /* Non-const version. */
-
-  template <typename F, typename... Args>
-  typename std::result_of<F(Args&...)>::type
-  apply(F f, std::tuple<Args...>& args) {
-    return subapply(f, args, range<sizeof...(Args)>());
-  }
-
-  template <typename F, typename... Args, int... Is>
-  typename std::result_of<F(Args&...)>::type
-  subapply(F f, std::tuple<Args...>& args, const range<0, Is...>&) {
-    return f(std::get<Is>(args)...);
+  template <typename F, typename Tuple, int... Is>
+  typename result_of_apply<F, typename std::decay<Tuple>::type>::type
+  subapply(F f, Tuple&& args, const range<0, Is...>&) {
+    return f(std::get<Is>(std::forward<Tuple>(args))...);
   }
 
 }
