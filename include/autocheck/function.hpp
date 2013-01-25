@@ -1,6 +1,8 @@
 #ifndef AUTOCHECK_FUNCTION_HPP
 #define AUTOCHECK_FUNCTION_HPP
 
+#include <functional>
+
 namespace autocheck {
 
   /* Generic identity function. */

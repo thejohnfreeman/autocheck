@@ -5,6 +5,7 @@
 #include <vector>
 #include <iterator>
 #include <limits>
+#include <algorithm>
 
 #include "is_one_of.hpp"
 #include "function.hpp"
