@@ -30,7 +30,7 @@ namespace autocheck {
 
   template <typename T, typename... Gens>
   T generate(std::tuple<Gens...>& gens, size_t size) {
-    return generate<T>(gens, size, range<sizeof...(Gens)>());
+    return autocheck::generate<T>(gens, size, range<sizeof...(Gens)>());
   }
 
   /* Generators produce an infinite sequence. */
@@ -278,7 +278,7 @@ namespace autocheck {
       typedef T result_type;
 
       result_type operator() (size_t size = 0) {
-        return generate<result_type>(gens, (size > 0) ? (size - 1) : size);
+        return autocheck::generate<result_type>(gens, (size > 0) ? (size - 1) : size);
       }
   };
 
