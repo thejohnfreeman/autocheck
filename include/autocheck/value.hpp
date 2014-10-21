@@ -53,6 +53,7 @@ namespace autocheck {
         clear();
         T* p = new (&object) T(args...);
         assert(p == &object);
+        (void)p;
         allocation = Static;
       }
 
