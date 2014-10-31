@@ -3,6 +3,9 @@
 
 #include <cassert>
 
+template <typename T>
+void unused(T& x) {}
+
 namespace autocheck {
 
   template <typename T>
@@ -53,7 +56,7 @@ namespace autocheck {
         clear();
         T* p = new (&object) T(args...);
         assert(p == &object);
-        (void)p;
+        unused(p);
         allocation = Static;
       }
 
