@@ -156,7 +156,8 @@ namespace autocheck {
 
       result_type operator() (size_t size = 0) {
         /* Distribution is non-static. */
-        std::uniform_real_distribution<Floating> dist(-size, size);
+        Floating f_size = static_cast<Floating>(size);
+        std::uniform_real_distribution<Floating> dist(-f_size, f_size);
         auto rv = dist(rng());
         return rv;
       }
