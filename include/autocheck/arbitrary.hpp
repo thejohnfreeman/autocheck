@@ -46,7 +46,7 @@ namespace autocheck {
       bool operator() (value<result_type>& candidate) {
         while (num_discards < max_discards) {
           /* Size starts at 0 and grows moderately. */
-          candidate = generate<result_type>(gens, resize_f(count >> 1));
+          candidate = generate<result_type>(gens, resize_f((num_discards + count) >> 1));
           if (prep_f) {
             apply(prep_f, candidate.ref());
           }
