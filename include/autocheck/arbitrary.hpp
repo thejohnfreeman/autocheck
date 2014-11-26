@@ -17,31 +17,32 @@ namespace autocheck {
   template <typename... Gens>
   class arbitrary {
     static_assert(sizeof...(Gens) > 0, "cannot create unit arbitrary");
-    public:
-      typedef std::tuple<typename Gens::result_type...> result_type;
 
-      typedef typename predicate<typename Gens::result_type...>::type
+    /* MSVC has difficulty with a direct `Gens...` parameter pack expansion
+     * in the 3 public typedefs below, but can be convinced to work with a
+     * trivial helper struct. */
+    template <typename T> struct ExpandArgs : T {};
+
+    public:
+      typedef std::tuple<typename ExpandArgs<Gens>::result_type...> result_type;
+
+      typedef typename predicate<typename ExpandArgs<Gens>::result_type...>::type
         discard_t;
-      typedef std::function<void (typename Gens::result_type&...)>
+      typedef std::function<void (typename ExpandArgs<Gens>::result_type&...)>
         prep_t;
 
     private:
       std::tuple<Gens...> gens;
-      size_t              count;
-      size_t              num_discards;
-      size_t              max_discards;
+      size_t              count = 0;
+      size_t              num_discards = 0;
+      size_t              max_discards = 500;
       discard_t           discard_f;
-      resize_t            resize_f;
+      resize_t            resize_f = id();
       prep_t              prep_f;
 
     public:
-      arbitrary() : arbitrary(Gens()...) {}
-
-      arbitrary(const Gens&... gens) :
-        gens(gens...),
-        count(0), num_discards(0), max_discards(500),
-        discard_f(), resize_f(id()), prep_f()
-      {}
+      arbitrary() {}
+      arbitrary(const Gens&... gens) : gens(gens...) {}
 
       bool operator() (value<result_type>& candidate) {
         while (num_discards < max_discards) {
