@@ -136,8 +136,9 @@ namespace autocheck {
       typedef SignedIntegral result_type;
 
       result_type operator() (size_t size = 0) {
+        auto s = static_cast<SignedIntegral>(size >> 1);
         /* Distribution is non-static. */
-        std::uniform_int_distribution<SignedIntegral> dist(-size, size);
+        std::uniform_int_distribution<SignedIntegral> dist(-s, s);
         auto rv = dist(rng());
         return rv;
       }
@@ -292,7 +293,6 @@ namespace autocheck {
   cons_generator<T, generator<Args>...> cons() {
     return cons_generator<T, generator<Args>...>();
   }
-
 }
 
 #endif
