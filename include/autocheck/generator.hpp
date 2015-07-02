@@ -271,8 +271,12 @@ namespace autocheck {
       std::tuple<Gens...> gens;
 
     public:
-      cons_generator() :
-        gens(Gens()...) {}
+      cons_generator() 
+#ifndef _MSC_VER
+		  :
+        gens(Gens()...) 
+#endif
+	{}
 
       cons_generator(const Gens&... gens) :
         gens(gens...) {}

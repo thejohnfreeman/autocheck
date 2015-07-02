@@ -17,10 +17,14 @@ namespace autocheck {
         Heap
       }    allocation = None;
 
+#ifndef _MSC_VER
       union {
+#endif
         T* pointer = nullptr;
         T  object;
+#ifndef _MSC_VER
       };
+#endif
 
     public:
       value() {}
