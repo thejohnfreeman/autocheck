@@ -273,10 +273,9 @@ namespace autocheck {
     public:
       cons_generator() 
 #ifndef _MSC_VER
-		  :
-        gens(Gens()...) 
+        : gens(Gens()...)
 #endif
-	{}
+      {}
 
       cons_generator(const Gens&... gens) :
         gens(gens...) {}

@@ -6,23 +6,23 @@ include(ExternalProject)
 set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/ThirdParty)
 
 ExternalProject_Add(
-	googlemock
-	#	SVN_REPOSITORY http://googlemock.googlecode.com/svn/tags/release-1.7.0
-	URL https://googlemock.googlecode.com/files/gmock-1.7.0.zip
-	TIMEOUT 30
-	#PATCH_COMMAND svn patch ${CMAKE_SOURCE_DIR}/gtest.patch ${CMAKE_BINARY_DIR}/ThirdParty/src/googlemock/gtest
-	# Force separate output paths for debug and release builds to allow easy
-	# identification of correct lib in subsequent TARGET_LINK_LIBRARIES commands
-	#CMAKE_ARGS -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG:PATH=DebugLibs
-	#			-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE:PATH=ReleaseLibs
-	#			-Dgtest_force_shared_crt=ON
-	CMAKE_ARGS -Dgtest_force_shared_crt=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-	# Disable install step
-	INSTALL_COMMAND ""
-	# Wrap download, configure and build steps in a script to log output
-	LOG_DOWNLOAD ON
-	LOG_CONFIGURE ON
-	LOG_BUILD ON)
+    googlemock
+    #	SVN_REPOSITORY http://googlemock.googlecode.com/svn/tags/release-1.7.0
+    URL https://googlemock.googlecode.com/files/gmock-1.7.0.zip
+    TIMEOUT 30
+    #PATCH_COMMAND svn patch ${CMAKE_SOURCE_DIR}/gtest.patch ${CMAKE_BINARY_DIR}/ThirdParty/src/googlemock/gtest
+    # Force separate output paths for debug and release builds to allow easy
+    # identification of correct lib in subsequent TARGET_LINK_LIBRARIES commands
+    #CMAKE_ARGS -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG:PATH=DebugLibs
+    #			-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE:PATH=ReleaseLibs
+    #			-Dgtest_force_shared_crt=ON
+    CMAKE_ARGS -Dgtest_force_shared_crt=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+    # Disable install step
+    INSTALL_COMMAND ""
+    # Wrap download, configure and build steps in a script to log output
+    LOG_DOWNLOAD ON
+    LOG_CONFIGURE ON
+    LOG_BUILD ON)
 
 # Specify include dir for googlemock and googletest
 ExternalProject_Get_Property(googlemock source_dir)
@@ -66,12 +66,12 @@ add_dependencies(reverse googlemock)
 
 ExternalProject_Get_Property(googlemock binary_dir)
 set(EXTRA_LIBRARIES 
-		${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gmock${CMAKE_FIND_LIBRARY_SUFFIXES} 
-		${binary_dir}/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main${CMAKE_FIND_LIBRARY_SUFFIXES})
+    ${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gmock${CMAKE_FIND_LIBRARY_SUFFIXES} 
+    ${binary_dir}/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main${CMAKE_FIND_LIBRARY_SUFFIXES})
 
 if( MSVC )
 else()
-	set(EXTRA_LIBRARIES ${EXTRA_LIBRARIES} rt pthread)
+    set(EXTRA_LIBRARIES ${EXTRA_LIBRARIES} rt pthread)
 endif()
 
 target_link_libraries(apply ${EXTRA_LIBRARIES})
