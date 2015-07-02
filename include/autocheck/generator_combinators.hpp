@@ -45,10 +45,11 @@ namespace autocheck {
           pred(pred), gen(gen) {}
 
         result_type operator() (size_t size = 0) {
-          while (true) {
+          for(size_t i;i<1000;i++){
             result_type rv(gen(size));
             if (pred(rv)) return rv;
           }
+          return (*this)(size+1);
         }
     };
 
