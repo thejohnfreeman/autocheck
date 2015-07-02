@@ -5,8 +5,7 @@
 
 namespace ac = autocheck;
 
-TEST(Check, DemonstrateFailingTest)
-{
+TEST(Check, DemonstrateFailingTest) {
   ac::gtest_reporter rep;
   /* This tests that every signed integer is positive. It is intended to
    * demonstrate failure behavior. */
