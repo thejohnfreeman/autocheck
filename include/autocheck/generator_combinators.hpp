@@ -2,6 +2,7 @@
 #define AUTOCHECK_GENERATOR_COMBINATORS_HPP
 
 #include <type_traits>
+#include <limits>
 
 namespace autocheck {
 
@@ -45,7 +46,7 @@ namespace autocheck {
           pred(pred), gen(gen) {}
 
         result_type operator() (size_t size = 0) {
-          for(size_t i;i<1000;i++){
+          for(size_t i{0}; i < std::numeric_limits<size_t>::max(); ++i){
             result_type rv(gen(size));
             if (pred(rv)) return rv;
           }
