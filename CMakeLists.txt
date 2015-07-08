@@ -31,6 +31,26 @@ include_directories(${source_dir}/include)
 include_directories(${source_dir}/gtest/include)
 include_directories(include)
 
+#Add the Catch C++ test library
+find_package(Git REQUIRED)
+
+ExternalProject_Add(
+    catch
+    PREFIX ${CMAKE_BINARY_DIR}/catch
+    GIT_REPOSITORY https://github.com/philsquared/Catch.git
+    TIMEOUT 10
+    UPDATE_COMMAND ${GIT_EXECUTABLE} pull
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    INSTALL_COMMAND ""
+    LOG_DOWNLOAD ON
+   )
+
+# Expose required variable (CATCH_INCLUDE_DIR) to parent scope
+ExternalProject_Get_Property(catch source_dir)
+set(CATCH_INCLUDE_DIR ${source_dir}/include CACHE INTERNAL "Path to include folder for Catch")
+include_directories(${CATCH_INCLUDE_DIR})
+
 file( GLOB APP_SOURCES test/*.cpp)
 foreach( testsourcepath ${APP_SOURCES} )
 	get_filename_component(testsourcefile ${testsourcepath} NAME)
@@ -48,3 +68,9 @@ add_dependencies(insert_sorted googlemock)
 
 add_executable(reverse tutorial/reverse/reverse.cpp)
 add_dependencies(reverse googlemock)
+
+add_executable(factorial tutorial/factorial.cpp)
+add_dependencies(factorial catch)
+
+add_executable(catch_check catch_tests/check.cpp)
+add_dependencies(catch_check catch)
