@@ -26,5 +26,5 @@ install:
     - make
 
 script:
-    - cd Build
+    - cd build
     - ctest -V
