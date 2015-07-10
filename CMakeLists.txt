@@ -29,28 +29,31 @@ ExternalProject_Add(
 
 ExternalProject_Get_Property(googlemock source_dir)
 ExternalProject_Get_Property(googlemock binary_dir)
-set(EXTRA_LIBRARIES 
-    ${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gmock${CMAKE_FIND_LIBRARY_SUFFIXES} 
-    ${binary_dir}/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main${CMAKE_FIND_LIBRARY_SUFFIXES})
 
 if( MSVC )
+set(EXTERNAL_LIBRARIES 
+    ${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gmock${CMAKE_FIND_LIBRARY_SUFFIXES} 
+    ${binary_dir}/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main${CMAKE_FIND_LIBRARY_SUFFIXES})
 else()
-    set(EXTRA_LIBRARIES ${EXTRA_LIBRARIES} rt pthread)
+    set(EXTERNAL_LIBRARIES 
+	${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gmock.a 
+	${binary_dir}/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main.a
+	rt pthread)
 endif()
+
+message("Libs: ${EXTERNAL_LIBRARIES}")
 
 include_directories(${source_dir}/include)
 include_directories(${source_dir}/gtest/include)
 include_directories(include)
 
 #Add the Catch C++ test library
-find_package(Git REQUIRED)
-
 ExternalProject_Add(
     catch
     PREFIX ${CMAKE_BINARY_DIR}/catch
-    GIT_REPOSITORY https://github.com/philsquared/Catch.git
+    URL https://github.com/philsquared/Catch/archive/v1.2.1.zip
     TIMEOUT 10
-    UPDATE_COMMAND ${GIT_EXECUTABLE} pull
+    UPDATE_COMMAND ""
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
     INSTALL_COMMAND ""
@@ -68,7 +71,7 @@ foreach( testsourcepath ${APP_SOURCES} )
     # I used a simple string replace, to cut off .cpp.
     string( REPLACE ".cpp" "" testname ${testsourcefile} )
     add_executable( ${testname} ${testsourcepath} )
-	target_link_libraries( ${testname} ${EXTRA_LIBRARIES})
+	target_link_libraries( ${testname} ${EXTERNAL_LIBRARIES})
 	add_dependencies(${testname} googlemock)
 	add_test(${testname} ${testname})
 endforeach( testsourcepath ${APP_SOURCES} )
