@@ -4,7 +4,4 @@ before_script:
     - mkdir build
 script: 
     - cd build
-    - cmake ..
-    - make
-    - make test
-    - ctest
+    - cmake .. && make && make test && ctest
