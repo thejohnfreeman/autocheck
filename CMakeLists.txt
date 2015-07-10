@@ -1,69 +1,22 @@
  cmake_minimum_required(VERSION 3.3)
 
-# Enable ExternalProject CMake module
 include(ExternalProject)
+enable_testing()
+
 # Set default ExternalProject root directory
 set_directory_properties(PROPERTIES EP_PREFIX ${CMAKE_BINARY_DIR}/ThirdParty)
 
 ExternalProject_Add(
     googlemock
-    #	SVN_REPOSITORY http://googlemock.googlecode.com/svn/tags/release-1.7.0
     URL https://googlemock.googlecode.com/files/gmock-1.7.0.zip
     TIMEOUT 30
-    #PATCH_COMMAND svn patch ${CMAKE_SOURCE_DIR}/gtest.patch ${CMAKE_BINARY_DIR}/ThirdParty/src/googlemock/gtest
-    # Force separate output paths for debug and release builds to allow easy
-    # identification of correct lib in subsequent TARGET_LINK_LIBRARIES commands
-    #CMAKE_ARGS -DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG:PATH=DebugLibs
-    #			-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE:PATH=ReleaseLibs
-    #			-Dgtest_force_shared_crt=ON
     CMAKE_ARGS -Dgtest_force_shared_crt=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-    # Disable install step
     INSTALL_COMMAND ""
-    # Wrap download, configure and build steps in a script to log output
     LOG_DOWNLOAD ON
     LOG_CONFIGURE ON
     LOG_BUILD ON)
 
-# Specify include dir for googlemock and googletest
 ExternalProject_Get_Property(googlemock source_dir)
-include_directories(${source_dir}/include)
-include_directories(${source_dir}/gtest/include)
-include_directories(include)
-
-add_executable(apply test/apply.cpp)
-add_dependencies(apply googlemock)
-
-add_executable(arbitrary test/arbitrary.cpp)
-add_dependencies(arbitrary googlemock)
-
-add_executable(check test/check.cpp)
-add_dependencies(check googlemock)
-
-add_executable(demonstrate_failure test/demonstrate_failure.cpp)
-add_dependencies(demonstrate_failure googlemock)
-
-add_executable(generator test/generator.cpp)
-add_dependencies(generator googlemock)
-
-add_executable(generator_combinators test/generator_combinators.cpp)
-add_dependencies(generator_combinators googlemock)
-
-add_executable(is_one_of test/is_one_of.cpp)
-add_dependencies(is_one_of googlemock)
-
-add_executable(largest test/largest.cpp)
-add_dependencies(largest googlemock)
-
-add_executable(value test/value.cpp)
-add_dependencies(value googlemock)
-
-#tutorials
-add_executable(insert_sorted tutorial/insert_sorted/insert_sorted.cpp)
-add_dependencies(insert_sorted googlemock)
-
-add_executable(reverse tutorial/reverse/reverse.cpp)
-add_dependencies(reverse googlemock)
-
 ExternalProject_Get_Property(googlemock binary_dir)
 set(EXTRA_LIBRARIES 
     ${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gmock${CMAKE_FIND_LIBRARY_SUFFIXES} 
@@ -74,25 +27,50 @@ else()
     set(EXTRA_LIBRARIES ${EXTRA_LIBRARIES} rt pthread)
 endif()
 
-target_link_libraries(apply ${EXTRA_LIBRARIES})
-target_link_libraries(arbitrary ${EXTRA_LIBRARIES})
-target_link_libraries(check ${EXTRA_LIBRARIES})
-target_link_libraries(demonstrate_failure ${EXTRA_LIBRARIES})
-target_link_libraries(generator ${EXTRA_LIBRARIES})
-target_link_libraries(generator_combinators ${EXTRA_LIBRARIES})
-target_link_libraries(is_one_of ${EXTRA_LIBRARIES})
-target_link_libraries(largest ${EXTRA_LIBRARIES})
-target_link_libraries(value ${EXTRA_LIBRARIES})
-target_link_libraries(insert_sorted ${EXTRA_LIBRARIES})
-target_link_libraries(reverse ${EXTRA_LIBRARIES})
+include_directories(${source_dir}/include)
+include_directories(${source_dir}/gtest/include)
+include_directories(include)
 
-enable_testing()
-add_test(apply apply)
-add_test(arbitrary arbitrary)
-add_test(check check)
-add_test(demonstrate_failure demonstrate_failure)
-add_test(generator generator)
-add_test(generator_combinators generator_combinators)
-add_test(is_one_of is_one_of)
-add_test(largest largest)
-add_test(value value)
+#Add the Catch C++ test library
+find_package(Git REQUIRED)
+
+ExternalProject_Add(
+    catch
+    PREFIX ${CMAKE_BINARY_DIR}/catch
+    GIT_REPOSITORY https://github.com/philsquared/Catch.git
+    TIMEOUT 10
+    UPDATE_COMMAND ${GIT_EXECUTABLE} pull
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND ""
+    INSTALL_COMMAND ""
+    LOG_DOWNLOAD ON
+   )
+
+# Expose required variable (CATCH_INCLUDE_DIR) to parent scope
+ExternalProject_Get_Property(catch source_dir)
+set(CATCH_INCLUDE_DIR ${source_dir}/include CACHE INTERNAL "Path to include folder for Catch")
+include_directories(${CATCH_INCLUDE_DIR})
+
+file( GLOB APP_SOURCES test/*.cpp)
+foreach( testsourcepath ${APP_SOURCES} )
+	get_filename_component(testsourcefile ${testsourcepath} NAME)
+    # I used a simple string replace, to cut off .cpp.
+    string( REPLACE ".cpp" "" testname ${testsourcefile} )
+    add_executable( ${testname} ${testsourcepath} )
+	target_link_libraries( ${testname} ${EXTRA_LIBRARIES})
+	add_dependencies(${testname} googlemock)
+	add_test(${testname} ${testname})
+endforeach( testsourcepath ${APP_SOURCES} )
+
+#tutorials
+add_executable(insert_sorted tutorial/insert_sorted/insert_sorted.cpp)
+add_dependencies(insert_sorted googlemock)
+
+add_executable(reverse tutorial/reverse/reverse.cpp)
+add_dependencies(reverse googlemock)
+
+add_executable(factorial tutorial/factorial.cpp)
+add_dependencies(factorial catch)
+
+add_executable(catch_check catch_tests/check.cpp)
+add_dependencies(catch_check catch)
