@@ -1,7 +1,18 @@
 language: cpp
-compiler: clang
-before_script: 
-    - mkdir build
-script: 
-    - cd build
-    - cmake .. && make && make test && ctest
+compiler: 
+    - clang
+    -gcc
+
+env:
+    - BUILD_TYPE=Debug
+    - BUILD_TYPE=Release
+
+install: 
+    - cmake -BBuild -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+    - cd Build
+    - make
+    - cd ..
+
+script:
+    - cd Build
+    - ctest -V
