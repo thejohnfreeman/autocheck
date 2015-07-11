@@ -18,13 +18,10 @@ env:
     - BUILD_TYPE=Debug
     - BUILD_TYPE=Release
 
-install: 
+script: 
     - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
     - mkdir build
     - cd build
     - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
     - make
-
-script:
-    - cd build
     - ctest -V
