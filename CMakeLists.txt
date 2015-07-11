@@ -3,11 +3,18 @@
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
   # using Clang
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -Wall")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
   # using GCC
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -O0 -g3 -ggdb")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
   # using Visual Studio C++
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /W3 /Od")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Ox")
 endif()
 
 include(ExternalProject)
@@ -40,8 +47,6 @@ else()
 	rt pthread)
 endif()
 
-message("Libs: ${EXTERNAL_LIBRARIES}")
-
 include_directories(${source_dir}/include)
 include_directories(${source_dir}/gtest/include)
 include_directories(include)
@@ -49,7 +54,6 @@ include_directories(include)
 #Add the Catch C++ test library
 ExternalProject_Add(
     catch
-    PREFIX ${CMAKE_BINARY_DIR}/catch
     URL https://github.com/philsquared/Catch/archive/v1.2.1.zip
     TIMEOUT 10
     UPDATE_COMMAND ""
@@ -61,6 +65,7 @@ ExternalProject_Add(
 
 # Expose required variable (CATCH_INCLUDE_DIR) to parent scope
 ExternalProject_Get_Property(catch source_dir)
+message("Include: ${source_dir}")
 set(CATCH_INCLUDE_DIR ${source_dir}/include CACHE INTERNAL "Path to include folder for Catch")
 include_directories(${CATCH_INCLUDE_DIR})
 
@@ -72,6 +77,7 @@ foreach( testsourcepath ${APP_SOURCES} )
     add_executable( ${testname} ${testsourcepath} )
 	target_link_libraries( ${testname} ${EXTERNAL_LIBRARIES})
 	add_dependencies(${testname} googlemock)
+	add_dependencies(${testname} catch)
 	add_test(${testname} ${testname})
 endforeach( testsourcepath ${APP_SOURCES} )
 
@@ -82,8 +88,9 @@ add_dependencies(insert_sorted googlemock)
 add_executable(reverse tutorial/reverse/reverse.cpp)
 add_dependencies(reverse googlemock)
 
-add_executable(factorial tutorial/factorial.cpp)
+add_executable(factorial tutorial/factorial/factorial.cpp)
 add_dependencies(factorial catch)
 
-add_executable(catch_check catch_tests/check.cpp)
-add_dependencies(catch_check catch)
+add_executable(demonstrate_failure tutorial/demonstrate_failure/demonstrate_failure.cpp)
+add_dependencies(demonstrate_failure googlemock)
+target_link_libraries(demonstrate_failure ${EXTERNAL_LIBRARIES})
