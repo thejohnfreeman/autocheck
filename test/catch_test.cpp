@@ -32,12 +32,12 @@ TEST_CASE("Archetype Testing", "[check]") {
   ac::catch_reporter rep;
 
   SECTION("bool"){
-	ac::check<bool>([] (bool x) { return true; }, 100,
-		ac::make_arbitrary<bool>(), rep);
+    ac::check<bool>([] (bool x) { return true; }, 100,
+        ac::make_arbitrary<bool>(), rep);
   }
 
   SECTION("bool with default parameters."){
-  ac::check<bool>([] (bool x) { return true; });
+    ac::check<bool>([] (bool x) { return true; });
   }
 
   reverse_prop_t reverse_prop;
