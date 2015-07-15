@@ -46,11 +46,10 @@ namespace autocheck {
           pred(pred), gen(gen) {}
 
         result_type operator() (size_t size = 0) {
-          for(size_t i{0}; i < std::numeric_limits<size_t>::max(); ++i){
+          while(true){
             result_type rv(gen(size));
             if (pred(rv)) return rv;
           }
-          return (*this)(size+1);
         }
     };
 
