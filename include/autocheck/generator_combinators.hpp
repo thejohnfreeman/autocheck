@@ -46,7 +46,7 @@ namespace autocheck {
           pred(pred), gen(gen) {}
 
         result_type operator() (size_t size = 0) {
-          while(true){
+          while (true) {
             result_type rv(gen(size));
             if (pred(rv)) return rv;
           }
