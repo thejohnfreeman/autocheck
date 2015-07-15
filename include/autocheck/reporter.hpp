@@ -60,11 +60,11 @@ namespace autocheck {
       std::ostream& out;
 
     public:
-      ostream_reporter(std::ostream& out = std::cout) : out(out) {}
+      ostream_reporter(std::ostream& out) : out(out) {}
+      ostream_reporter() : ostream_reporter(std::cout) {}
 
       virtual void success(size_t tests, size_t max_tests,
-          size_t trivial, distribution&& dist) const
-      {
+          size_t trivial, distribution&& dist) const {
         report_success(out, tests, max_tests, trivial, std::move(dist));
       }
 
@@ -91,26 +91,6 @@ namespace autocheck {
         ASSERT_TRUE(AUTOCHECK_SUCCESS) << out.str();
       }
   };
-
-struct gtest_checker
-{
-    std::function<void(std::string const&)> expectfn;
-    std::string msg;
-    ostream_reporter rep;
-    template<class FN>
-    void operator <<(FN const& fn)
-    {
-        fn(rep);
-        expectfn(msg);
-    }
-
-    template<class FN>
-    gtest_checker& expect(FN const& fn)
-    {
-        expectfn = fn;
-        return *this;
-    }
-};
 
 #endif // ASSERT_TRUE
 
