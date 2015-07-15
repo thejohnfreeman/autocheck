@@ -2,7 +2,6 @@
 #define AUTOCHECK_GENERATOR_COMBINATORS_HPP
 
 #include <type_traits>
-#include <limits>
 
 namespace autocheck {
 
