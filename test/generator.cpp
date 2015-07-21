@@ -18,7 +18,7 @@ void generate() {
     using namespace autocheck;
     std::clog << gen(i);
   }
-  std::clog << std::endl;
+  std::clog << '\n';
 }
 
 #define TEST_GENERATOR(name, type)\

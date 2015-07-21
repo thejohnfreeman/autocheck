@@ -39,7 +39,7 @@ TEST(Generator, Resize) {
 
 TEST(Generator, Composition) {
   const int factor = 2;
-  auto gen = ac::resize([] (size_t size) { return size * factor; },
+  auto gen = ac::resize([factor] (size_t size) { return size * factor; },
       ac::map([] (bool, size_t n) { return n; },
       ac::generator<bool>()));
   std::clog << "sizeof(gen) = " << sizeof(gen) << std::endl;

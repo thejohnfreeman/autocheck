@@ -17,10 +17,15 @@ namespace autocheck {
         Heap
       }    allocation = None;
 
+#ifndef _MSC_VER
+      //Visual Studio 2013 doesn't support unrestricted unions
       union {
+#endif
         T* pointer = nullptr;
         T  object;
+#ifndef _MSC_VER
       };
+#endif
 
     public:
       value() {}

@@ -1,5 +1,7 @@
 #include <algorithm>
-#include <gtest/gtest.h>
+#define CATCH_CONFIG_MAIN
+#include <catch.hpp>
+
 #include <autocheck/sequence.hpp>
 #include <autocheck/check.hpp>
 
@@ -26,32 +28,41 @@ void insert_sorted(const T& x, std::vector<T>& xs) {
   }
 }
 
-TEST(Check, Compiles) {
-  ac::gtest_reporter rep;
+TEST_CASE("Archetype Testing", "[check]") {
+  ac::catch_reporter rep;
 
-  ac::check<bool>([] (bool x) { return true; }, 100,
-      ac::make_arbitrary<bool>(), rep);
+  SECTION("bool") {
+    ac::check<bool>([] (bool x) { return true; }, 100,
+        ac::make_arbitrary<bool>(), rep);
+  }
 
-  ac::check<bool>([] (bool x) { return true; });
+  SECTION("bool with default parameters.") {
+    ac::check<bool>([] (bool x) { return true; });
+  }
 
   reverse_prop_t reverse_prop;
+  SECTION("reverse property over int") {
+    ac::check<std::vector<int>>(reverse_prop, 100,
+        ac::make_arbitrary(ac::list_of<int>()), rep);
+    ac::check<std::vector<int>>(reverse_prop, 100,
+        ac::make_arbitrary(ac::cons<std::vector<int>, unsigned int, int>()),
+        rep);
+  }
 
-  ac::check<std::vector<int>>(reverse_prop, 100,
-      ac::make_arbitrary(ac::list_of<int>()), rep);
-  ac::check<std::vector<int>>(reverse_prop, 100,
-      ac::make_arbitrary(ac::cons<std::vector<int>, unsigned int, int>()),
-      rep);
+  SECTION("reverse property over chars") {
+    ac::check<std::vector<char>>(reverse_prop, 100,
+        ac::make_arbitrary(ac::list_of(ac::generator<char>())), rep);
+    ac::check<std::vector<std::string>>(reverse_prop, 100,
+        ac::make_arbitrary(ac::list_of<std::string>()), rep);
+  }
 
-  ac::check<std::vector<char>>(reverse_prop, 100,
-      ac::make_arbitrary(ac::list_of(ac::generator<char>())), rep);
-  ac::check<std::vector<std::string>>(reverse_prop, 100,
-      ac::make_arbitrary(ac::list_of<std::string>()), rep);
-
-  ac::check<std::string>(reverse_prop, 100,
-      ac::make_arbitrary<std::string>(), rep);
-  ac::check<std::string>(reverse_prop, 100,
-      ac::make_arbitrary(ac::string<>()),
-      rep);
+  SECTION("reverse property over strings.") {
+    ac::check<std::string>(reverse_prop, 100,
+        ac::make_arbitrary<std::string>(), rep);
+    ac::check<std::string>(reverse_prop, 100,
+        ac::make_arbitrary(ac::string<>()),
+        rep);
+  }
 
   /* Chaining, ... */
   //auto arb = ac::make_arbitrary(ac::generator<int>(), ac::ordered_list<int>())
