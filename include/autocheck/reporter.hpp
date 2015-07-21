@@ -60,11 +60,11 @@ namespace autocheck {
       std::ostream& out;
 
     public:
-      ostream_reporter(std::ostream& out) : out(out) {}
-      ostream_reporter() : ostream_reporter(std::cout) {}
+      ostream_reporter(std::ostream& out = std::cout) : out(out) {}
 
       virtual void success(size_t tests, size_t max_tests,
-          size_t trivial, distribution&& dist) const {
+          size_t trivial, distribution&& dist) const 
+	  {
         report_success(out, tests, max_tests, trivial, std::move(dist));
       }
 
