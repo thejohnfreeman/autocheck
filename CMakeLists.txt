@@ -1,8 +1,8 @@
  cmake_minimum_required(VERSION 2.8)
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-  # using Clang
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y")
+ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+  # using Clang or AppleClang
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -stdlib=libc++")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -Wall")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -37,14 +37,17 @@ ExternalProject_Get_Property(googlemock source_dir)
 ExternalProject_Get_Property(googlemock binary_dir)
 
 if( MSVC )
-set(EXTERNAL_LIBRARIES 
-    ${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gmock${CMAKE_FIND_LIBRARY_SUFFIXES} 
-    ${binary_dir}/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main${CMAKE_FIND_LIBRARY_SUFFIXES})
+    set(EXTERNAL_LIBRARIES
+        ${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gmock${CMAKE_FIND_LIBRARY_SUFFIXES}
+        ${binary_dir}/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main${CMAKE_FIND_LIBRARY_SUFFIXES})
 else()
-    set(EXTERNAL_LIBRARIES 
-	${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gmock.a 
-	${binary_dir}/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main.a
-	rt pthread)
+    set(EXTERNAL_LIBRARIES
+        ${binary_dir}/${CMAKE_FIND_LIBRARY_PREFIXES}gmock.a
+        ${binary_dir}/gtest/${CMAKE_FIND_LIBRARY_PREFIXES}gtest_main.a
+        pthread)
+    if( UNIX AND NOT APPLE )
+        list(append EXTERNAL_LIBRARIES rt)
+    endif()
 endif()
 
 include_directories(${source_dir}/include)
@@ -71,14 +74,14 @@ include_directories(${CATCH_INCLUDE_DIR})
 
 file( GLOB APP_SOURCES test/*.cpp)
 foreach( testsourcepath ${APP_SOURCES} )
-	get_filename_component(testsourcefile ${testsourcepath} NAME)
+        get_filename_component(testsourcefile ${testsourcepath} NAME)
     # I used a simple string replace, to cut off .cpp.
     string( REPLACE ".cpp" "" testname ${testsourcefile} )
     add_executable( ${testname} ${testsourcepath} )
-	target_link_libraries( ${testname} ${EXTERNAL_LIBRARIES})
-	add_dependencies(${testname} googlemock)
-	add_dependencies(${testname} catch)
-	add_test(${testname} ${testname})
+        target_link_libraries( ${testname} ${EXTERNAL_LIBRARIES})
+        add_dependencies(${testname} googlemock)
+        add_dependencies(${testname} catch)
+        add_test(${testname} ${testname})
 endforeach( testsourcepath ${APP_SOURCES} )
 
 #tutorials
