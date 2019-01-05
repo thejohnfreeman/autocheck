@@ -15,17 +15,22 @@ namespace autocheck {
         None,
         Static,
         Heap
-      }    allocation = None;
+      }    allocation =
 
-#ifndef _MSC_VER
-      //Visual Studio 2013 doesn't support unrestricted unions
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+                        None;
+
       union {
+#else
+                        Static;
+	  //Visual Studio 2013 doesn't support unrestricted unions
 #endif
         T* pointer = nullptr;
         T  object;
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
       };
 #endif
+
 
     public:
       value() {}
