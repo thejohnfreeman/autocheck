@@ -10,27 +10,30 @@ namespace autocheck {
 
   template <typename T>
   class value {
-    private:
+    private:  
+      // Visual Studio before 2015 doesn't support unrestricted unions.
+      // However, if we declare `T object` as a member,
+      // then we must declare the allocation as `Static`,
+      // or else `object` will leak when we start to generate test values.
       enum {
         None,
         Static,
         Heap
       }    allocation =
-
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
                         None;
-
-      union {
 #else
                         Static;
-	  //Visual Studio 2013 doesn't support unrestricted unions
+#endif
+
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+      union {
 #endif
         T* pointer = nullptr;
         T  object;
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
       };
 #endif
-
 
     public:
       value() {}
