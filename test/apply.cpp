@@ -26,4 +26,3 @@ TEST(Apply, Two) {
 TEST(Apply, Three) {
   ASSERT_TRUE(autocheck::apply(f3, std::make_tuple('c', nullptr, 3.14f)));
 }
-
