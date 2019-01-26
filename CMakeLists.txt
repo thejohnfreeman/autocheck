@@ -16,7 +16,7 @@ foreach(flag
   endif(${flag} MATCHES "/MD")
 endforeach(flag)
 
-add_subdirectory(external/googletest)
+add_subdirectory(external)
 add_subdirectory(include)
 enable_testing()
 add_subdirectory(tests)
