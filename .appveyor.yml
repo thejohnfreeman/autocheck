@@ -1,6 +1,9 @@
 # This configuration was influenced by googletest:
 # https://github.com/google/googletest/blob/master/appveyor.yml
 
+platform:
+  - x64
+
 environment:
   matrix:
     - GENERATOR: Visual Studio 14 2015
@@ -22,6 +25,7 @@ install:
   - pip.exe install conan
   - conan user
   - conan --version
+  - conan remote list
 
 build_script:
   - ps: |
