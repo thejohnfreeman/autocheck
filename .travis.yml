@@ -39,11 +39,12 @@ install:
   - sudo pip install --upgrade conan --ignore-installed
   - conan user
   - conan --version
+  - conan remote list
 
 script:
   - mkdir build
   - cd build
-  - conan install ..
+  - conan install --build missing ..
   - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
   - make -j 4
   - ctest -V
