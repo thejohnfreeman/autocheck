@@ -36,7 +36,7 @@ matrix:
         - BUILD_TYPE=Release
 
 install:
-  - pip install canon
+  - pip install canon --user
   - conan user
 
 script:
