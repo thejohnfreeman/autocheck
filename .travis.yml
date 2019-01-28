@@ -1,10 +1,5 @@
+sudo: required
 language: cpp
-
-addons:
-  apt:
-    packages:
-      - python3
-      - python3-pip
 
 matrix:
   include:
@@ -47,8 +42,7 @@ matrix:
         - BUILD_TYPE=Release
 
 install:
-  - pip3 install canon --user --upgrade
-  - export PATH=$HOME/.local/bin:$PATH
+  - sudo pip install canon --upgrade
   - conan user
   - conan --version
 
