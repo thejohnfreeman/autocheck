@@ -37,6 +37,7 @@ matrix:
 
 install:
   - sudo pip install canon
+  - python -c 'import sys; print(sys.path)'
   - conan user
   - conan --version
 
