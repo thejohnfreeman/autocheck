@@ -10,32 +10,38 @@ matrix:
       env:
         - BUILD_TYPE=Debug
         - CXXFLAGS='-D_GLIBCXX_USE_CXX11_ABI=1'
+        - LIBCXX=libstdc++11
     - os: linux
       dist: xenial
       compiler: clang
       env:
         - BUILD_TYPE=Release
         - CXXFLAGS='-D_GLIBCXX_USE_CXX11_ABI=1'
+        - LIBCXX=libstdc++11
     - os: linux
       dist: xenial
       compiler: gcc
       env:
         - BUILD_TYPE=Debug
         - CXXFLAGS='-D_GLIBCXX_USE_CXX11_ABI=1'
+        - LIBCXX=libstdc++11
     - os: linux
       dist: xenial
       compiler: gcc
       env:
         - BUILD_TYPE=Release
         - CXXFLAGS='-D_GLIBCXX_USE_CXX11_ABI=1'
+        - LIBCXX=libstdc++11
     - os: osx
       compiler: clang
       env:
         - BUILD_TYPE=Debug
+        - LIBCXX=libc++
     - os: osx
       compiler: clang
       env:
         - BUILD_TYPE=Release
+        - LIBCXX=libc++
     # GCC on OSX is just a wrapper for Clang.
 
 install:
@@ -49,7 +55,7 @@ script:
   - mkdir build
   - cd build
   - conan install
-    --setting "compiler.libcxx=libstdc++11"
+    --setting "compiler.libcxx=$LIBCXX"
     --setting "build_type=$BUILD_TYPE"
     --build missing
     ..
