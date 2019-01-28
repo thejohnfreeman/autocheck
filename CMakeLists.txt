@@ -16,7 +16,9 @@ foreach(flag
   endif(${flag} MATCHES "/MD")
 endforeach(flag)
 
-add_subdirectory(external)
+set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_MODULE_PATH})
+find_package(gtest)
+
 add_subdirectory(include)
 enable_testing()
 add_subdirectory(tests)

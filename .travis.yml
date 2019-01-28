@@ -35,9 +35,14 @@ matrix:
       env:
         - BUILD_TYPE=Release
 
+install:
+  - pip install canon
+  - conan user
+
 script:
   - mkdir build
   - cd build
+  - conan install ..
   - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
   - make -j 4
   - ctest -V

@@ -16,12 +16,10 @@ configuration:
   - Debug
   - Release
 
-install:
-  - git submodule update --init --recursive
-
 build_script:
   - ps: |
       md build
+      conan install .
       cd build
       cmake -G $env:GENERATOR "-DCMAKE_CONFIGURATION_TYPES=Debug;Release" ..
       if ($LastExitCode -ne 0) {
