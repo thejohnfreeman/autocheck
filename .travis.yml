@@ -3,24 +3,24 @@ language: cpp
 
 matrix:
   include:
-    # We need use to Ubuntu Trusty to get pip3.
+    # We need to use Ubuntu Xenial to upgrade pip.
     - os: linux
-      dist: trusty
+      dist: xenial
       compiler: clang
       env:
         - BUILD_TYPE=Debug
     - os: linux
-      dist: trusty
+      dist: xenial
       compiler: clang
       env:
         - BUILD_TYPE=Release
     - os: linux
-      dist: trusty
+      dist: xenial
       compiler: gcc
       env:
         - BUILD_TYPE=Debug
     - os: linux
-      dist: trusty
+      dist: xenial
       compiler: gcc
       env:
         - BUILD_TYPE=Release
