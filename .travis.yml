@@ -9,21 +9,25 @@ matrix:
       compiler: clang
       env:
         - BUILD_TYPE=Debug
+        - CXXFLAGS='-D_GLIBCXX_USE_CXX11_ABI=1'
     - os: linux
       dist: xenial
       compiler: clang
       env:
         - BUILD_TYPE=Release
+        - CXXFLAGS='-D_GLIBCXX_USE_CXX11_ABI=1'
     - os: linux
       dist: xenial
       compiler: gcc
       env:
         - BUILD_TYPE=Debug
+        - CXXFLAGS='-D_GLIBCXX_USE_CXX11_ABI=1'
     - os: linux
       dist: xenial
       compiler: gcc
       env:
         - BUILD_TYPE=Release
+        - CXXFLAGS='-D_GLIBCXX_USE_CXX11_ABI=1'
     - os: osx
       compiler: clang
       env:
@@ -49,7 +53,6 @@ script:
     --setting "build_type=$BUILD_TYPE"
     --build missing
     ..
-  - CXXFLAGS='-D_GLIBCXX_USE_CXX11_ABI=1'
-    cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
+  - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
   - cmake --build . --config ${BUILD_TYPE} -- -j 4
   - ctest -C $BUILD_TYPE -V
