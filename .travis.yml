@@ -42,7 +42,8 @@ matrix:
         - BUILD_TYPE=Release
 
 install:
-  - sudo pip install canon --upgrade
+  - sudo pip install --upgrade pip
+  - sudo pip install --upgrade conan
   - conan user
   - conan --version
 
