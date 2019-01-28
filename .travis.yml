@@ -2,19 +2,27 @@ language: cpp
 
 matrix:
   include:
-    - os: linux
+    # We need use to Ubuntu Trusty to get pip3.
+    - <<: &os-linux
+        os: linux
+        dist: trusty
+        addons:
+          apt:
+            packages:
+              - python3
+              - python3-pip
       compiler: clang
       env:
         - BUILD_TYPE=Debug
-    - os: linux
+    - <<: *os-linux
       compiler: clang
       env:
         - BUILD_TYPE=Release
-    - os: linux
+    - <<: *os-linux
       compiler: gcc
       env:
         - BUILD_TYPE=Debug
-    - os: linux
+    - <<: *os-linux
       compiler: gcc
       env:
         - BUILD_TYPE=Release
@@ -36,8 +44,8 @@ matrix:
         - BUILD_TYPE=Release
 
 install:
-  - sudo pip install canon
-  - python -c 'import sys; print(sys.path)'
+  - pip3 install canon --user
+  - export PATH=$HOME/.local/bin:$PATH
   - conan user
   - conan --version
 
