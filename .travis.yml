@@ -36,8 +36,7 @@ matrix:
         - BUILD_TYPE=Release
 
 install:
-  - pip install canon --user
-  - export PATH="${PATH}:$(python -c 'import site; print(site.USER_BASE)')/bin"
+  - sudo pip install canon
   - conan user
   - conan --version
 
