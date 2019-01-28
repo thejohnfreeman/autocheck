@@ -37,7 +37,9 @@ matrix:
 
 install:
   - pip install canon --user
+  - export PATH="${PATH}:$(python -c 'import site; print(site.USER_BASE)')/bin"
   - conan user
+  - conan --version
 
 script:
   - mkdir build

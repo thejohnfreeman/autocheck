@@ -16,6 +16,13 @@ configuration:
   - Debug
   - Release
 
+# Unclear how to do this in PowerShell.
+install:
+  - set PATH=%PATH%;%PYTHON%/Scripts/
+  - pip.exe install conan
+  - conan user
+  - conan --version
+
 build_script:
   - ps: |
       md build
