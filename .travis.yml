@@ -36,7 +36,7 @@ matrix:
 
 install:
   - sudo pip install --upgrade pip
-  - sudo pip install --upgrade conan
+  - sudo pip install --upgrade conan --ignore-installed
   - conan user
   - conan --version
 
