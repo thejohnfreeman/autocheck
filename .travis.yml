@@ -46,5 +46,5 @@ script:
   - cd build
   - conan install --setting build_type=$BUILD_TYPE --build missing ..
   - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
-  - make -j 4
-  - ctest -V
+  - cmake --build . --config ${BUILD_TYPE} -- -j 4
+  - ctest -C $BUILD_TYPE -V

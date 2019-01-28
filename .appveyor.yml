@@ -28,6 +28,7 @@ install:
   - conan --version
   - conan remote list
 
+# `/m` is for parallel build.
 build_script:
   - ps: |
       md build
