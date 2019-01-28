@@ -18,7 +18,10 @@ foreach(TEST_SOURCE_PATH ${TEST_SOURCE_PATHS})
   get_filename_component(TEST_SOURCE_NAME ${TEST_SOURCE_PATH} NAME)
   string(REPLACE ".cpp" "" TARGET ${TEST_SOURCE_NAME})
   add_executable(${TARGET} EXCLUDE_FROM_ALL ${TEST_SOURCE_PATH})
-  target_link_libraries(${TARGET} PRIVATE autocheck::autocheck)
-  target_link_libraries(${TARGET} PRIVATE gtest::gtest)
+  target_link_libraries(${TARGET}
+    PRIVATE
+      autocheck::autocheck
+      gtest::gtest
+  )
   add_test_from_target(${TARGET})
 endforeach(TEST_SOURCE_PATH ${TEST_SOURCE_PATHS})

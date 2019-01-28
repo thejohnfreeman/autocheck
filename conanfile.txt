@@ -1,5 +1,6 @@
 [requires]
 gtest/1.8.1@bincrafters/stable
+catch2/2.5.0@bincrafters/stable
 
 [generators]
 cmake_find_package
