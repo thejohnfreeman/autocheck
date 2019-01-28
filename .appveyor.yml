@@ -27,7 +27,7 @@ build_script:
   - ps: |
       md build
       cd build
-      conan install --settings compiler.runtime=MT ..
+      conan install ..
       cmake -G $env:GENERATOR "-DCMAKE_CONFIGURATION_TYPES=Debug;Release" ..
       if ($LastExitCode -ne 0) {
         throw $ErrorMessage
