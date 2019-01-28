@@ -47,7 +47,7 @@ matrix:
         - BUILD_TYPE=Release
 
 install:
-  - pip3 install canon --user
+  - pip3 install canon --user --upgrade
   - export PATH=$HOME/.local/bin:$PATH
   - conan user
   - conan --version
