@@ -1,5 +1,5 @@
 set(demonstrate_failure_DEPENDS autocheck::autocheck gtest::gtest)
-set(factorial_DEPENDS autocheck::autocheck catch2::catch2)
+set(factorial_DEPENDS autocheck::autocheck Catch2::Catch2)
 set(insert_sorted_DEPENDS autocheck::autocheck)
 set(reverse_DEPENDS autocheck::autocheck)
 
