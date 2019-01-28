@@ -33,13 +33,13 @@ build_script:
   - ps: |
       md build
       cd build
-      conan install \
-        --setting "arch=$env:ARCH" \
-        --setting "build_type=$env:CONFIGURATION" \
+      conan install `
+        --setting "arch=$env:ARCH" `
+        --setting "build_type=$env:CONFIGURATION" `
         ..
-      cmake \
-        -G "$env:GENERATOR" \
-        "-DCMAKE_CONFIGURATION_TYPES=Debug;Release" \
+      cmake `
+        -G "$env:GENERATOR" `
+        "-DCMAKE_CONFIGURATION_TYPES=Debug;Release" `
         ..
       if ($LastExitCode -ne 0) {
         throw $ErrorMessage
