@@ -1,18 +1,19 @@
 # This configuration was influenced by googletest:
 # https://github.com/google/googletest/blob/master/appveyor.yml
 
-platform:
-  - x64
-
 environment:
   matrix:
-    - GENERATOR: Visual Studio 14 2015
+    - ARCH: x86
+      GENERATOR: Visual Studio 14 2015
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-    - GENERATOR: Visual Studio 14 2015 Win64
+    - ARCH: x86_64
+      GENERATOR: Visual Studio 14 2015 Win64
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-    - GENERATOR: Visual Studio 15 2017
+    - ARCH: x86
+      GENERATOR: Visual Studio 15 2017
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-    - GENERATOR: Visual Studio 15 2017 Win64
+    - ARCH: x86_64
+      GENERATOR: Visual Studio 15 2017 Win64
       APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
 
 configuration:
@@ -31,7 +32,7 @@ build_script:
   - ps: |
       md build
       cd build
-      conan install ..
+      conan install --setting arch=$env:ARCH --setting build_type=$env:CONFIGURATION ..
       cmake -G $env:GENERATOR "-DCMAKE_CONFIGURATION_TYPES=Debug;Release" ..
       if ($LastExitCode -ne 0) {
         throw $ErrorMessage
