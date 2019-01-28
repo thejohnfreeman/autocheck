@@ -45,7 +45,6 @@ script:
   - mkdir build
   - cd build
   - conan install \
-    --setting "compiler=$COMPILER" \
     --setting "compiler.libcxx=libstdc++11" \
     --setting "build_type=$BUILD_TYPE" \
     --build missing \
