@@ -33,19 +33,25 @@ build_script:
   - ps: |
       md build
       cd build
-      conan install --setting arch=$env:ARCH --setting build_type=$env:CONFIGURATION ..
-      cmake -G $env:GENERATOR "-DCMAKE_CONFIGURATION_TYPES=Debug;Release" ..
+      conan install \
+        --setting "arch=$env:ARCH" \
+        --setting "build_type=$env:CONFIGURATION" \
+        ..
+      cmake \
+        -G "$env:GENERATOR" \
+        "-DCMAKE_CONFIGURATION_TYPES=Debug;Release" \
+        ..
       if ($LastExitCode -ne 0) {
         throw $ErrorMessage
       }
-      cmake --build . --config $env:CONFIGURATION -- /m
+      cmake --build . --config "$env:CONFIGURATION" -- /m
       if ($LastExitCode -ne 0) {
         throw $ErrorMessage
       }
 
 test_script:
   - ps: |
-      ctest -C $env:CONFIGURATION -V
+      ctest -C "$env:CONFIGURATION" -V
       if ($LastExitCode -ne 0) {
         throw $ErrorMessage
       }

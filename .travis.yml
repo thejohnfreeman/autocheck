@@ -44,7 +44,13 @@ install:
 script:
   - mkdir build
   - cd build
-  - conan install --setting build_type=$BUILD_TYPE --build missing ..
-  - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
+  - conan install \
+    --setting "compiler=$COMPILER" \
+    --setting "compiler.libcxx=libstdc++11" \
+    --setting "build_type=$BUILD_TYPE" \
+    --build missing \
+    ..
+  - CXXFLAGS='-D_GLIBCXX_USE_CXX11_ABI=1' \
+    cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
   - cmake --build . --config ${BUILD_TYPE} -- -j 4
   - ctest -C $BUILD_TYPE -V
