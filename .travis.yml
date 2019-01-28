@@ -32,14 +32,7 @@ matrix:
       compiler: clang
       env:
         - BUILD_TYPE=Release
-    - os: osx
-      compiler: gcc
-      env:
-        - BUILD_TYPE=Debug
-    - os: osx
-      compiler: gcc
-      env:
-        - BUILD_TYPE=Release
+    # GCC on OSX is just a wrapper for Clang.
 
 install:
   - sudo pip install --upgrade pip
