@@ -45,7 +45,9 @@ matrix:
     # GCC on OSX is just a wrapper for Clang.
 
 install:
-  - curl --location https://raw.githubusercontent.com/thejohnfreeman/cmake-future/master/install.sh | sudo bash
+  # The root environment on Travis does not have cmake on its PATH.
+  # https://github.com/travis-ci/travis-ci/issues/9113#issuecomment-366448032
+  - curl --location https://raw.githubusercontent.com/thejohnfreeman/cmake-future/master/install.sh | sudo env "PATH=$PATH" bash
   - sudo pip install --upgrade pip
   - sudo pip install --upgrade conan --ignore-installed
   - conan user

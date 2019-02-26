@@ -7,6 +7,7 @@ project(autocheck VERSION 1.0.0 LANGUAGES CXX)
 set(CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR} ${CMAKE_MODULE_PATH})
 find_package(gtest)
 find_package(Catch2)
+find_package(future)
 
 add_subdirectory(include)
 enable_testing()
