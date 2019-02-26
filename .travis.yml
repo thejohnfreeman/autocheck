@@ -45,6 +45,7 @@ matrix:
     # GCC on OSX is just a wrapper for Clang.
 
 install:
+  - curl --location https://raw.githubusercontent.com/thejohnfreeman/cmake-future/master/install.sh | sudo bash
   - sudo pip install --upgrade pip
   - sudo pip install --upgrade conan --ignore-installed
   - conan user
