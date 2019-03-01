@@ -23,14 +23,19 @@ configuration:
 # Unclear how to do this in PowerShell.
 install:
   - set PATH=%PATH%;%PYTHON%/Scripts/
-  - pip.exe install conan
-  - conan user
-  - conan --version
-  - conan remote list
+  - ps: |
+      $ErrorActionPreference = "Stop"
+      pip.exe --disable-pip-version-check install conan
+      Invoke-RestMethod https://raw.githubusercontent.com/thejohnfreeman/cmake-future/master/install.ps `
+        | powershell
+      conan user
+      conan --version
+      conan remote list
 
 # `/m` is for parallel build.
 build_script:
   - ps: |
+      $ErrorActionPreference = "Stop"
       md build
       cd build
       conan install `
@@ -41,17 +46,9 @@ build_script:
         -G "$env:GENERATOR" `
         "-DCMAKE_CONFIGURATION_TYPES=Debug;Release" `
         ..
-      if ($LastExitCode -ne 0) {
-        throw $ErrorMessage
-      }
       cmake --build . --config "$env:CONFIGURATION" -- /m
-      if ($LastExitCode -ne 0) {
-        throw $ErrorMessage
-      }
 
 test_script:
   - ps: |
+      $ErrorActionPreference = "Stop"
       ctest -C "$env:CONFIGURATION" -V
-      if ($LastExitCode -ne 0) {
-        throw $ErrorMessage
-      }
