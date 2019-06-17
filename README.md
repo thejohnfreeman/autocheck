@@ -13,6 +13,6 @@ Please consult the [wiki][] for documentation.
 ## Install
 
 ```sh
-conan remote add autocheck https://api.bintray.com/conan/thejohnfreeman/autocheck
-conan install autocheck/[*]@autocheck/stable
+conan remote add jfreeman https://api.bintray.com/conan/jfreeman/jfreeman
+conan install autocheck/[*]@jfreeman/stable
 ```
