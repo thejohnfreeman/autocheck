@@ -2,7 +2,7 @@ from conans import ConanFile
 
 class AutocheckConan(ConanFile):
     name = 'autocheck'
-    license = 'MIT'
+    license = 'ISC'
     author = 'John Freeman <jfreeman08@gmail.com>'
     url = 'https://github.com/thejohnfreeman/autocheck'
     description = 'QuickCheck clone for C++'
