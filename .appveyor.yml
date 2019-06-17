@@ -30,6 +30,7 @@ install:
         | powershell
       conan user
       conan --version
+      conan remote add jfreeman https://api.bintray.com/conan/jfreeman/jfreeman
       conan remote list
 
 # `/m` is for parallel build.

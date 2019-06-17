@@ -52,6 +52,7 @@ install:
   - sudo pip install --upgrade conan --ignore-installed
   - conan user
   - conan --version
+  - conan remote add jfreeman https://api.bintray.com/conan/jfreeman/jfreeman
   - conan remote list
 
 script:
