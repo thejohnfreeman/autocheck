@@ -22,21 +22,20 @@ configuration:
 
 # Unclear how to do this in PowerShell.
 install:
-  - set PATH=%PATH%;%PYTHON%/Scripts/
   - ps: |
+      $env:PATH = "$env:PYTHON;$env:PYTHON\Scripts;$env:PATH"
       $ErrorActionPreference = "Stop"
-      pip.exe --disable-pip-version-check install conan
-      Invoke-RestMethod https://raw.githubusercontent.com/thejohnfreeman/cmake-future/master/install.ps `
-        | powershell
+      pip.exe install --upgrade pip
+      pip.exe install --upgrade conan --ignore-installed
       conan user
       conan --version
       conan remote add jfreeman https://api.bintray.com/conan/jfreeman/jfreeman
       conan remote list
 
-# `/m` is for parallel build.
 build_script:
   - ps: |
       $ErrorActionPreference = "Stop"
+      $env:CMAKE_BUILD_PARALLEL_LEVEL = ""
       md build
       cd build
       conan install `
@@ -45,11 +44,12 @@ build_script:
         ..
       cmake `
         -G "$env:GENERATOR" `
-        "-DCMAKE_CONFIGURATION_TYPES=Debug;Release" `
+        "-DCMAKE_CONFIGURATION_TYPES=$env:CONFIGURATION" `
         ..
-      cmake --build . --config "$env:CONFIGURATION" -- /m
+      cmake --build . --config "$env:CONFIGURATION"
 
 test_script:
   - ps: |
       $ErrorActionPreference = "Stop"
-      ctest -C "$env:CONFIGURATION" -V
+      $env:CTEST_PARALLEL_LEVEL = ""
+      ctest --build-config "$env:CONFIGURATION" --verbose
