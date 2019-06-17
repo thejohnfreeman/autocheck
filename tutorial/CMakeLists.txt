@@ -1,22 +1,22 @@
-set(demonstrate_failure_DEPENDS autocheck::autocheck gtest::gtest)
-set(factorial_DEPENDS autocheck::autocheck Catch2::Catch2)
-set(insert_sorted_DEPENDS autocheck::autocheck)
-set(reverse_DEPENDS autocheck::autocheck)
-
-# file(GLOB TUTORIAL_SOURCE_PATHS "*.cpp" CONFIGURE_DEPENDS)
-file(GLOB TUTORIAL_SOURCE_PATHS "*.cpp")
-foreach(TUTORIAL_SOURCE_PATH ${TUTORIAL_SOURCE_PATHS})
-  get_filename_component(TUTORIAL_SOURCE_NAME ${TUTORIAL_SOURCE_PATH} NAME)
-  string(REPLACE ".cpp" "" TARGET ${TUTORIAL_SOURCE_NAME})
-  add_executable(${TARGET} EXCLUDE_FROM_ALL ${TUTORIAL_SOURCE_PATH})
-  target_link_libraries(${TARGET} PRIVATE ${${TARGET}_DEPENDS})
+future_get_names_with_file_suffix(tutorials ".cpp")
+foreach(tutorial ${tutorials})
+  add_executable(${tutorial} EXCLUDE_FROM_ALL ${tutorial}.cpp)
   # We just need to test that we can compile the tutorials.
   add_test(
-    NAME ${TARGET}
+    NAME ${tutorial}
     COMMAND
       ${CMAKE_COMMAND}
-        --build ${CMAKE_BINARY_DIR}
-        --target ${TARGET}
-        --config $<CONFIG>
+      --build ${CMAKE_BINARY_DIR}
+      --target ${tutorial}
+      --config $<CONFIG>
     )
-endforeach(TUTORIAL_SOURCE_PATH ${TUTORIAL_SOURCE_PATHS})
+endforeach()
+
+target_link_libraries(demonstrate_failure
+  PRIVATE autocheck::autocheck GTest::gtest_main
+)
+target_link_libraries(factorial
+  PRIVATE autocheck::autocheck Catch2::Catch2
+)
+target_link_libraries(insert_sorted PRIVATE autocheck::autocheck)
+target_link_libraries(reverse PRIVATE autocheck::autocheck)

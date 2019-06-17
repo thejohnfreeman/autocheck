@@ -1,11 +1,7 @@
-# file(GLOB TEST_SOURCE_PATHS "*.cpp" CONFIGURE_DEPENDS)
-get_names_with_file_suffix(TESTS ".cpp")
-foreach(TEST ${TESTS})
-  add_executable(${TEST} EXCLUDE_FROM_ALL ${TEST}.cpp)
-  target_link_libraries(${TEST}
-    PRIVATE
-      autocheck::autocheck
-      gtest::gtest
+future_get_names_with_file_suffix(tests ".cpp")
+foreach(test ${tests})
+  future_add_test_executable(${test} EXCLUDE_FROM_ALL ${test}.cpp)
+  target_link_libraries(${test}
+    PRIVATE autocheck::autocheck GTest::gtest_main GTest::gtest
   )
-  add_test_from_target(${TEST})
-endforeach(TEST ${TESTS})
+endforeach()
