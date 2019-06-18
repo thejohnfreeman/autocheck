@@ -71,7 +71,10 @@ script:
     --setting "build_type=$BUILD_TYPE"
     --build missing
     ..
-  - cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE ..
+  - cmake
+    -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
+    "-DCMAKE_TOOLCHAIN_FILE=${PWD}/conan_paths.cmake"
+    ..
   - cmake --build . --config ${BUILD_TYPE}
   - export CTEST_PARALLEL_LEVEL=
-  - ctest --build-config $BUILD_TYPE --verbose
+  - ctest --build-config ${BUILD_TYPE} --verbose

@@ -23,7 +23,7 @@ configuration:
 # Unclear how to do this in PowerShell.
 install:
   - ps: |
-      $env:PATH = "$env:PYTHON;$env:PYTHON\Scripts;$env:PATH"
+      ${env:PATH} = "${env:PYTHON};${env:PYTHON}\Scripts;${env:PATH}"
       $ErrorActionPreference = "Stop"
       pip.exe install --upgrade pip
       pip.exe install --upgrade conan --ignore-installed
@@ -39,17 +39,18 @@ build_script:
       md build
       cd build
       conan install `
-        --setting "arch=$env:ARCH" `
-        --setting "build_type=$env:CONFIGURATION" `
+        --setting "arch=${env:ARCH}" `
+        --setting "build_type=${env:CONFIGURATION}" `
         ..
       cmake `
-        -G "$env:GENERATOR" `
-        "-DCMAKE_CONFIGURATION_TYPES=$env:CONFIGURATION" `
+        -G "${env:GENERATOR}" `
+        "-DCMAKE_CONFIGURATION_TYPES=${env:CONFIGURATION}" `
+        "-DCMAKE_TOOLCHAIN_FILE=${pwd}/conan_paths.cmake" `
         ..
-      cmake --build . --config "$env:CONFIGURATION"
+      cmake --build . --config "${env:CONFIGURATION}"
 
 test_script:
   - ps: |
       $ErrorActionPreference = "Stop"
       $env:CTEST_PARALLEL_LEVEL = ""
-      ctest --build-config "$env:CONFIGURATION" --verbose
+      ctest --build-config "${env:CONFIGURATION}" --verbose
