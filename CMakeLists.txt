@@ -20,7 +20,6 @@ future_project(
 )
 
 future_add_dependency(PRIVATE GTest CONFIG)
-target_compile_options(GTest::gtest INTERFACE "-D_GLIBCXX_USE_CXX11_ABI=0")
 future_add_dependency(PRIVATE Catch2)
 
 add_subdirectory(include)
