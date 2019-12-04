@@ -1,6 +1,7 @@
 #ifndef AUTOCHECK_GENERATOR_HPP
 #define AUTOCHECK_GENERATOR_HPP
 
+#include <cassert>
 #include <random>
 #include <vector>
 #include <iterator>
@@ -23,14 +24,15 @@ namespace autocheck {
 
   template <typename T, typename... Gens, int... Is>
   T generate(std::tuple<Gens...>& gens, size_t size,
-      const range<0, Is...>&)
+      const detail::range<0, Is...>&)
   {
     return T(std::get<Is>(gens)(size)...);
   }
 
   template <typename T, typename... Gens>
   T generate(std::tuple<Gens...>& gens, size_t size) {
-    return autocheck::generate<T>(gens, size, range<sizeof...(Gens)>());
+    return autocheck::generate<T>(gens, size,
+        detail::range<sizeof...(Gens)>());
   }
 
   /* Generators produce an infinite sequence. */
@@ -143,6 +145,42 @@ namespace autocheck {
         return rv;
       }
   };
+
+  /** Generate values in the range [low, high). */
+  template <typename SignedIntegral>
+  class range_generator {
+    private:
+      SignedIntegral low;
+      SignedIntegral len;
+      generator<SignedIntegral> igen;
+
+    public:
+      range_generator(const SignedIntegral& low, const SignedIntegral& high) :
+        low(low), len(high - low)
+      {
+        assert(len > 0);
+      }
+
+      typedef SignedIntegral result_type;
+
+      result_type operator() (size_t size = 0) {
+        auto i = igen(size) % len;
+        i = (i > 0) ? i : (i + len);
+        return low + i;
+      }
+  };
+
+  template <typename SignedIntegral>
+  range_generator<SignedIntegral> range(
+      const SignedIntegral& low, const SignedIntegral& high)
+  {
+    return range_generator<SignedIntegral>(low, high);
+  }
+
+  template <typename SignedIntegral>
+  range_generator<SignedIntegral> range(const SignedIntegral& high) {
+    return range(0, high);
+  }
 
   template <typename Floating>
   class generator<
@@ -271,7 +309,7 @@ namespace autocheck {
       std::tuple<Gens...> gens;
 
     public:
-      cons_generator() 
+      cons_generator()
 #ifndef _MSC_VER
         : gens(Gens()...)
 #endif
