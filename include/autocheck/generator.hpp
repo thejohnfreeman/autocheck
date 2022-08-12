@@ -82,7 +82,7 @@ namespace autocheck {
           size = std::numeric_limits<CharType>::max();
         }
         /* Distribution is non-static. */
-        std::uniform_int_distribution<int> dist(0, size);
+        std::uniform_int_distribution<int> dist(0, static_cast<int>(size));
         auto i = dist(rng());
         auto rv =
           (size < detail::nalnums) ? detail::alnums[i] :
@@ -120,7 +120,7 @@ namespace autocheck {
 
       result_type operator() (size_t size = 0) {
         /* Distribution is non-static. */
-        std::uniform_int_distribution<UnsignedIntegral> dist(0, size);
+        std::uniform_int_distribution<UnsignedIntegral> dist(0, static_cast<UnsignedIntegral>(size));
         auto rv = dist(rng());
         return rv;
       }
