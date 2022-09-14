@@ -334,6 +334,14 @@ namespace autocheck {
   cons_generator<T, generator<Args>...> cons() {
     return cons_generator<T, generator<Args>...>();
   }
+
+  template <typename... Args>
+  class generator<std::tuple<Args...>> : public cons_generator<std::tuple<Args...>, generator<Args>...> {};
+
+  template <typename... Gens>
+  cons_generator<std::tuple<typename Gens::result_type...>, Gens...> tuple(const Gens&... gens) {
+    return cons_generator<std::tuple<typename Gens::result_type...>, Gens...>(gens...);
+  }
 }
 
 #endif
