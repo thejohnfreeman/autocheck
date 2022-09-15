@@ -342,6 +342,28 @@ namespace autocheck {
   cons_generator<std::tuple<typename Gens::result_type...>, Gens...> tuple(const Gens&... gens) {
     return cons_generator<std::tuple<typename Gens::result_type...>, Gens...>(gens...);
   }
+
+  template <typename T>
+  class constant_generator
+  {
+    public:
+      constant_generator(T value) : value(value) {}
+
+      using result_type = T;
+
+      result_type operator() (size_t = 0)
+      {
+          return value;
+      }
+    private:
+      T value;
+  };
+
+  template <typename T>
+  constant_generator<T> constant(T value)
+  {
+    return constant_generator<T>(value);
+  }
 }
 
 #endif
