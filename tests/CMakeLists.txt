@@ -1,7 +1,20 @@
-future_get_names_with_file_suffix(tests ".cpp")
+cupcake_find_package(GTest 1.13.0)
+
+set(tests
+  apply
+  arbitrary
+  check
+  generator_combinators
+  generator
+  is_one_of
+  largest
+  value
+)
+
 foreach(test ${tests})
-  future_add_test_executable(${test} EXCLUDE_FROM_ALL ${test}.cpp)
-  target_link_libraries(${test}
-    PRIVATE autocheck::autocheck GTest::gtest_main GTest::gtest
+  cupcake_add_test_executable(${test} ${test}.cpp)
+  target_link_libraries(${this}
+    autocheck::libautocheck
+    GTest::gtest_main
   )
 endforeach()

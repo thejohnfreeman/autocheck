@@ -1,18 +1,51 @@
-from conans import python_requires
+from conan import ConanFile
+from conan.tools.cmake import CMake
 
-CMakeConanFile = python_requires('autorecipes/[*]@jfreeman/testing').cmake()
+class Autocheck(ConanFile):
+    name = 'autocheck'
+    version = '1.0.0'
 
-class Recipe(CMakeConanFile):
-    name = CMakeConanFile.__dict__['name']
-    version = CMakeConanFile.__dict__['version']
-    topics = ('testing')
-    settings = None
-    build_requires = (
-        'future/[*]@jfreeman/testing',
-        'Catch2/2.5.0@catchorg/stable',
-        'gtest/1.8.1@bincrafters/stable',
-    )
-    generators = 'cmake_find_package', 'cmake_paths'
+    license = 'ISC'
+    author = 'John Freeman <jfreeman08@gmail.com>'
 
-    def package_id(self):
-        return self.info.header_only()
+    settings = 'os', 'compiler', 'build_type', 'arch'
+    options = {'shared': [True, False], 'fPIC': [True, False]}
+    default_options = {'shared': False, 'fPIC': True}
+
+    requires = ['cupcake/0.1.0']
+    test_requires = ['catch2/3.3.2', 'gtest/1.13.0']
+    generators = ['CMakeDeps', 'CMakeToolchain']
+
+    exports_sources = [
+        'CMakeLists.txt',
+        'cmake/*',
+        'external/*',
+        'include/*',
+        'src/*',
+    ]
+
+    # For out-of-source build.
+    # https://docs.conan.io/en/latest/reference/build_helpers/cmake.html#configure
+    no_copy_source = True
+
+    def requirements(self):
+        for requirement in self.test_requires:
+            self.requires(requirement)
+
+    def config_options(self):
+        if self.settings.os == 'Windows':
+            del self.options.fPIC
+
+    def build(self):
+        cmake = CMake(self)
+        cmake.configure(variables={'BUILD_TESTING': 'NO'})
+        cmake.build()
+
+    def package(self):
+        cmake = CMake(self)
+        cmake.install()
+
+    def package_info(self):
+        path = f'{self.package_folder}/share/{self.name}/cpp_info.py'
+        with open(path, 'r') as file:
+            exec(file.read(), {}, {'self': self.cpp_info})

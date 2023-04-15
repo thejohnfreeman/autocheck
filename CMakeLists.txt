@@ -1,6 +1,3 @@
-# Need 3.1 for C++11.
-# Need 3.7 for future.
-# Need 3.12 for CONFIGURE_DEPENDS.
 # https://cliutils.gitlab.io/modern-cmake/chapters/intro/newcmake.html
 cmake_minimum_required(VERSION 3.7)
 project(autocheck
@@ -12,19 +9,18 @@ project(autocheck
 
 set(CMAKE_FIND_PACKAGE_SORT_ORDER NATURAL)
 set(CMAKE_FIND_PACKAGE_SORT_DIRECTION DEC)
-find_package(future CONFIG REQUIRED)
+find_package(cupcake 0.1.0 REQUIRED)
 
-future_project(
+cupcake_project(
   LICENSE "ISC"
   AUTHORS "John Freeman <jfreeman08@gmail.com>"
 )
 
-future_add_dependency(PRIVATE GTest CONFIG)
-future_add_dependency(PRIVATE Catch2)
+cupcake_add_library(autocheck)
 
-add_subdirectory(include)
-enable_testing()
-add_subdirectory(tests)
-add_subdirectory(tutorial)
+cupcake_add_tests()
 
-future_install_project()
+# add_subdirectory(tutorial)
+
+cupcake_install_project()
+cupcake_install_cpp_info()

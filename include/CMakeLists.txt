@@ -1,2 +1,0 @@
-future_add_headers(autocheck)
-target_compile_features(autocheck INTERFACE cxx_std_11)
