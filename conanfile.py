@@ -12,7 +12,7 @@ class Autocheck(ConanFile):
     options = {'shared': [True, False], 'fPIC': [True, False]}
     default_options = {'shared': False, 'fPIC': True}
 
-    requires = ['cupcake/0.1.0']
+    requires = ['cupcake/0.2.0@github/thejohnfreeman']
     test_requires = ['catch2/3.3.2', 'gtest/1.13.0']
     generators = ['CMakeDeps', 'CMakeToolchain']
 

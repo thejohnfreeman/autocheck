@@ -1,5 +1,6 @@
 # https://cliutils.gitlab.io/modern-cmake/chapters/intro/newcmake.html
 cmake_minimum_required(VERSION 3.7)
+
 project(autocheck
   VERSION 1.0.0
   LANGUAGES CXX
@@ -7,9 +8,7 @@ project(autocheck
   HOMEPAGE_URL "https://github.com/thejohnfreeman/autocheck"
 )
 
-set(CMAKE_FIND_PACKAGE_SORT_ORDER NATURAL)
-set(CMAKE_FIND_PACKAGE_SORT_DIRECTION DEC)
-find_package(cupcake 0.1.0 REQUIRED)
+find_package(cupcake 0.2.0 REQUIRED)
 
 cupcake_project(
   LICENSE "ISC"

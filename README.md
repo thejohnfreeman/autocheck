@@ -9,6 +9,6 @@ Please consult the [wiki][] for documentation.
 ## Install
 
 ```sh
-conan remote add jfreeman https://api.bintray.com/conan/jfreeman/jfreeman
-conan install autocheck/[*]@jfreeman/stable
+conan remote add redirectory https://conan.jfreeman.dev
+conan install autocheck/[*]@github/thejohnfreeman
 ```
