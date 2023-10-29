@@ -4,6 +4,8 @@ from conan.tools.cmake import CMake
 class Autocheck(ConanFile):
     name = 'autocheck'
     version = '1.0.0'
+    user = 'github'
+    channel = 'thejohnfreeman'
 
     license = 'ISC'
     author = 'John Freeman <jfreeman08@gmail.com>'
