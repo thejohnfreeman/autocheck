@@ -25,6 +25,7 @@ namespace autocheck {
     typedef typename std::result_of<F(Args&...)>::type type;
   };
 
+#if !defined(__cpp_lib_apply)
   template <typename F, typename Tuple, int... Is>
   typename result_of_apply<F, typename std::decay<Tuple>::type>::type
   subapply(F f, Tuple&& args, const detail::range<0, Is...>&) {
@@ -38,6 +39,7 @@ namespace autocheck {
         std::forward<Tuple>(args),
         detail::range<std::tuple_size<typename std::decay<Tuple>::type>::value>());
   }
+#endif
 
 }
 

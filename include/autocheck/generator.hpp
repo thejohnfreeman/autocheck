@@ -4,6 +4,9 @@
 #include <cassert>
 #include <random>
 #include <vector>
+#include <set>
+#include <map>
+#include <unordered_map>
 #include <iterator>
 #include <limits>
 #include <algorithm>
@@ -22,11 +25,25 @@ namespace autocheck {
     return rng;
   }
 
+  template <typename T, typename... Args, int... Is>
+  T construct(const std::tuple<Args...>& args,
+      const detail::range<0, Is...>&)
+  {
+    return T{ std::get<Is>(args)... };
+  }
+
+  template <typename T, typename... Args>
+  T construct(const std::tuple<Args...>& args)
+  {
+    return autocheck::construct<T>(args,
+        detail::range<sizeof...(Args)>());
+  }
+
   template <typename T, typename... Gens, int... Is>
   T generate(std::tuple<Gens...>& gens, size_t size,
       const detail::range<0, Is...>&)
   {
-    return T(std::get<Is>(gens)(size)...);
+    return T{ std::get<Is>(gens)(size)... };
   }
 
   template <typename T, typename... Gens>
@@ -82,7 +99,7 @@ namespace autocheck {
           size = std::numeric_limits<CharType>::max();
         }
         /* Distribution is non-static. */
-        std::uniform_int_distribution<int> dist(0, size);
+        std::uniform_int_distribution<int> dist(0, static_cast<int>(size));
         auto i = dist(rng());
         auto rv =
           (size < detail::nalnums) ? detail::alnums[i] :
@@ -120,7 +137,7 @@ namespace autocheck {
 
       result_type operator() (size_t size = 0) {
         /* Distribution is non-static. */
-        std::uniform_int_distribution<UnsignedIntegral> dist(0, size);
+        std::uniform_int_distribution<UnsignedIntegral> dist(0, static_cast<UnsignedIntegral>(size));
         auto rv = dist(rng());
         return rv;
       }
@@ -240,40 +257,95 @@ namespace autocheck {
   class generator<std::basic_string<CharType>> :
     public string_generator<generator<CharType>> {};
 
-  /* TODO: Generic sequence generator. */
-
-  template <typename Gen>
+  template <typename Gen, template<typename, typename...> class Container = std::vector, typename... ContainerArgs>
   class list_generator {
     private:
       Gen eltgen;
+      std::tuple<ContainerArgs...> args;
 
     public:
-      list_generator(const Gen& eltgen = Gen()) :
-        eltgen(eltgen) {}
+      template <typename Tuple = std::tuple<ContainerArgs...>>
+      list_generator(const Gen& eltgen = Gen(), const Tuple& args = Tuple()) :
+        eltgen(eltgen), args(args) {}
 
-      typedef std::vector<typename Gen::result_type> result_type;
+      typedef Container<typename Gen::result_type, ContainerArgs...> result_type;
 
       result_type operator() (size_t size = 0) {
-        result_type rv;
-        rv.reserve(size);
-        std::generate_n(std::back_insert_iterator<result_type>(rv), size,
+        auto rv = autocheck::construct<result_type>(args);
+        std::generate_n(std::insert_iterator<result_type>(rv, rv.end()), size,
             fix(size, eltgen));
         return rv;
       }
   };
 
+  namespace detail {
+    template <template<typename...> class Container, typename T, typename... Others>
+    struct map_for;
+
+    template <template<typename...> class Container, typename F, typename S, typename... Others>
+    struct map_for<Container, std::pair<F, S>, Others...>
+    {
+        using type = Container<F, S, Others...>;
+    };
+
+    template <typename... Ts>
+    using map_for_t = typename map_for<std::map, Ts...>::type;
+
+    template <typename... Ts>
+    using unordered_map_for_t = typename map_for<std::unordered_map, Ts...>::type;
+  }
+
   template <typename Gen>
-  list_generator<Gen> list_of(const Gen& gen) {
-    return list_generator<Gen>(gen);
+  list_generator<Gen, std::vector> list_of(const Gen& gen) {
+    return list_generator<Gen, std::vector>(gen);
   }
 
   template <typename T, typename Gen = generator<T>>
-  list_generator<Gen> list_of() {
+  list_generator<Gen, std::vector> list_of() {
     return list_of(Gen());
   }
 
-  template <typename T>
-  class generator<std::vector<T>> : public list_generator<generator<T>> {};
+  template <typename Gen>
+  list_generator<Gen, std::set> set_of(const Gen& gen) {
+    return list_generator<Gen, std::set>(gen);
+  }
+
+  template <typename T, typename Gen = generator<T>>
+  list_generator<Gen, std::set> set_of() {
+    return set_of(Gen());
+  }
+
+  template <typename Gen>
+  list_generator<Gen, detail::map_for_t> map_of(const Gen& gen) {
+    return list_generator<Gen, detail::map_for_t>(gen);
+  }
+
+  template <typename T, typename Gen = generator<T>>
+  list_generator<Gen, detail::map_for_t> map_of() {
+    return map_of(Gen());
+  }
+
+  template <typename Gen>
+  list_generator<Gen, detail::unordered_map_for_t> unordered_map_of(const Gen& gen) {
+    return list_generator<Gen, detail::map_for_t>(gen);
+  }
+
+  template <typename T, typename Gen = generator<T>>
+  list_generator<Gen, detail::unordered_map_for_t> unordered_map_of() {
+    return unordered_map_of(Gen());
+  }
+
+  template <typename T, typename A>
+  class generator<std::vector<T, A>> : public list_generator<generator<T>, std::vector, A> {};
+
+  template<typename T, typename C, typename A>
+  class generator<std::set<T, C, A>> : public list_generator<generator<T>, std::set, C, A> {};
+
+  template<typename K, typename V, typename C, typename A>
+  class generator<std::map<K, V, C, A>> : public list_generator<generator<std::pair<K, V>>, detail::map_for_t, C, A> {};
+
+  template<typename K, typename V, typename C, typename A>
+  class generator<std::unordered_map<K, V, C, A>> : public list_generator<generator<std::pair<K, V>>, detail::unordered_map_for_t, C, A> {};
 
   /* Ordered list combinator. */
 
@@ -333,6 +405,36 @@ namespace autocheck {
   template <typename T, typename... Args>
   cons_generator<T, generator<Args>...> cons() {
     return cons_generator<T, generator<Args>...>();
+  }
+
+  template <typename... Args>
+  class generator<std::tuple<Args...>> : public cons_generator<std::tuple<Args...>, generator<Args>...> {};
+
+  template <typename... Gens>
+  cons_generator<std::tuple<typename Gens::result_type...>, Gens...> tuple(const Gens&... gens) {
+    return cons_generator<std::tuple<typename Gens::result_type...>, Gens...>(gens...);
+  }
+
+  template <typename T>
+  class constant_generator
+  {
+    public:
+      constant_generator(T value) : value(value) {}
+
+      using result_type = T;
+
+      result_type operator() (size_t = 0)
+      {
+          return value;
+      }
+    private:
+      T value;
+  };
+
+  template <typename T>
+  constant_generator<T> constant(T value)
+  {
+    return constant_generator<T>(value);
   }
 }
 
