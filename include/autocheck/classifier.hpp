@@ -63,11 +63,11 @@ namespace autocheck {
       }
 
       void check(const std::tuple<Args...>& args) {
-        if (apply(is_trivial, args)) ++num_trivial;
+        if (autocheck::apply(is_trivial, args)) ++num_trivial;
 
         std::string tags;
         for (tagger_t& tagger : taggers) {
-          std::string tag = apply(tagger, args);
+          std::string tag = autocheck::apply(tagger, args);
           if (tag.empty()) continue;
           if (!tags.empty()) tags += ", ";
           tags += tag;
