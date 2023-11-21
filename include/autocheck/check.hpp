@@ -45,7 +45,7 @@ namespace autocheck {
       }
 
       cls.check(args.cref());
-      if (!autocheck::apply(prop, args.ref())) {
+      if (!apply(prop, args.ref())) {
         rep.failure(tests, reason.str().c_str());
         return;
       }

@@ -1,6 +1,16 @@
 #ifndef AUTOCHECK_APPLY_HPP
 #define AUTOCHECK_APPLY_HPP
 
+#ifndef AUTOCHECK_HAS_STD_APPLY
+#ifndef AUTOCHECK_DISABLE_STD_APPLY
+
+#ifdef __cpp_lib_apply
+#define AUTOCHECK_HAS_STD_APPLY
+#endif
+
+#endif
+#endif
+
 #include <type_traits>
 #include <tuple>
 
@@ -9,6 +19,7 @@ namespace autocheck {
   /* To extend for more fixed-size containers, just overload result_of_apply,
    * std::tuple_size, and std::get. */
 
+  // TODO: Replace with `std::integer_sequence`.
   namespace detail {
     template <int N, int... Is>
     struct range : range<N - 1, N - 1, Is...> {};
@@ -16,6 +27,8 @@ namespace autocheck {
     template <int... Is>
     struct range<0, Is...> {};
   }
+
+#ifndef AUTOCHECK_HAS_STD_APPLY
 
   template <typename F, typename Tuple>
   struct result_of_apply {};
@@ -39,7 +52,8 @@ namespace autocheck {
         detail::range<std::tuple_size<typename std::decay<Tuple>::type>::value>());
   }
 
+#endif
+
 }
 
 #endif
-

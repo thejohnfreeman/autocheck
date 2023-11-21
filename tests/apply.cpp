@@ -15,6 +15,8 @@ bool f3(char c, const char* p, float f) {
     ((f - 3.14) < std::numeric_limits<float>::epsilon());
 }
 
+#ifndef AUTOCHECK_HAS_STD_APPLY
+
 TEST(Apply, One) {
   ASSERT_TRUE(autocheck::apply(f1, std::make_tuple('c')));
 }
@@ -26,3 +28,5 @@ TEST(Apply, Two) {
 TEST(Apply, Three) {
   ASSERT_TRUE(autocheck::apply(f3, std::make_tuple('c', nullptr, 3.14f)));
 }
+
+#endif
