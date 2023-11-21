@@ -1,6 +1,8 @@
-#include <iostream>
-#include <gtest/gtest.h>
 #include <autocheck/generator.hpp>
+
+#include <gtest/gtest.h>
+
+#include <iostream>
 
 namespace ac = autocheck;
 

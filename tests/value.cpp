@@ -1,5 +1,6 @@
-#include <gtest/gtest.h>
 #include <autocheck/value.hpp>
+
+#include <gtest/gtest.h>
 
 struct leaker {
   static int alive;

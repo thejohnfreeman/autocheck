@@ -1,10 +1,11 @@
 #ifndef AUTOCHECK_CLASSIFIER_HPP
 #define AUTOCHECK_CLASSIFIER_HPP
 
-#include <unordered_map>
-#include <sstream>
+#include <autocheck/distribution.hpp>
+#include <autocheck/function.hpp>
 
-#include "function.hpp"
+#include <sstream>
+#include <unordered_map>
 
 namespace autocheck {
 

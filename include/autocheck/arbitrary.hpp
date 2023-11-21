@@ -1,12 +1,12 @@
 #ifndef AUTOCHECK_ARBITRARY_HPP
 #define AUTOCHECK_ARBITRARY_HPP
 
+#include <autocheck/function.hpp>
+#include <autocheck/generator.hpp>
+#include <autocheck/value.hpp>
+
 #include <cassert>
 #include <cstdio>
-
-#include "function.hpp"
-#include "generator.hpp"
-#include "value.hpp"
 
 namespace autocheck {
 

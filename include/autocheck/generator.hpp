@@ -1,18 +1,18 @@
 #ifndef AUTOCHECK_GENERATOR_HPP
 #define AUTOCHECK_GENERATOR_HPP
 
+#include <autocheck/function.hpp>
+#include <autocheck/generator_combinators.hpp>
+#include <autocheck/is_one_of.hpp>
+
+#include <algorithm>
 #include <cassert>
-#include <random>
-#include <vector>
 #include <iterator>
 #include <limits>
-#include <algorithm>
+#include <random>
 #include <tuple>
 #include <utility>
-
-#include "is_one_of.hpp"
-#include "function.hpp"
-#include "generator_combinators.hpp"
+#include <vector>
 
 namespace autocheck {
 

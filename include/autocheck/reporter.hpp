@@ -1,11 +1,13 @@
 #ifndef AUTOCHECK_REPORTER_HPP
 #define AUTOCHECK_REPORTER_HPP
 
+#include <autocheck/distribution.hpp>
+
+#include <algorithm>
+#include <cassert>
+#include <cmath>
 #include <iostream>
 #include <sstream>
-#include <cmath>
-
-#include "distribution.hpp"
 
 namespace autocheck {
 

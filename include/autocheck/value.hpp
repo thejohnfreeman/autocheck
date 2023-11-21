@@ -1,6 +1,8 @@
 #ifndef AUTOCHECK_VALUE_HPP
 #define AUTOCHECK_VALUE_HPP
 
+#include <autocheck/ostream.hpp>
+
 #include <cassert>
 
 template <typename T>

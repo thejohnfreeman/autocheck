@@ -1,5 +1,6 @@
-#include <gtest/gtest.h>
 #include <autocheck/is_one_of.hpp>
+
+#include <gtest/gtest.h>
 
 namespace ac = autocheck;
 

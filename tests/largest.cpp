@@ -1,5 +1,6 @@
-#include <gtest/gtest.h>
 #include <autocheck/largest.hpp>
+
+#include <gtest/gtest.h>
 
 namespace ac = autocheck;
 

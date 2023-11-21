@@ -1,7 +1,10 @@
-#include <algorithm>
 #include <gtest/gtest.h>
+
+#include <autocheck/reporter.hpp>
 #include <autocheck/sequence.hpp>
 #include <autocheck/check.hpp>
+
+#include <algorithm>
 
 namespace ac = autocheck;
 
