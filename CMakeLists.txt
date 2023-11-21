@@ -8,7 +8,7 @@ project(autocheck
   HOMEPAGE_URL "https://github.com/thejohnfreeman/autocheck"
 )
 
-find_package(cupcake 0.2.0 REQUIRED)
+find_package(cupcake 0.4.1 REQUIRED)
 
 cupcake_project(
   LICENSE "ISC"
