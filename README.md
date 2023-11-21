@@ -1,6 +1,6 @@
 # autocheck
 
-Header-only C++11 library for QuickCheck (and later, SmallCheck) testing.
+Header-only C++17 library for QuickCheck (and later, SmallCheck) testing.
 
 Please consult the [wiki][] for documentation.
 

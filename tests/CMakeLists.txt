@@ -1,7 +1,6 @@
 cupcake_find_package(GTest 1.13.0)
 
 set(tests
-  apply
   arbitrary
   check
   generator_combinators

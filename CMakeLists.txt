@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.7)
 project(autocheck
   VERSION 1.0.0
   LANGUAGES CXX
-  DESCRIPTION "Header-only C++11 library for property-based testing."
+  DESCRIPTION "Header-only C++17 library for property-based testing."
   HOMEPAGE_URL "https://github.com/thejohnfreeman/autocheck"
 )
 

@@ -7,11 +7,12 @@
 #include <iterator>
 #include <limits>
 #include <algorithm>
+#include <tuple>
+#include <utility>
 
 #include "is_one_of.hpp"
 #include "function.hpp"
 #include "generator_combinators.hpp"
-#include "apply.hpp"
 
 namespace autocheck {
 
@@ -22,9 +23,9 @@ namespace autocheck {
     return rng;
   }
 
-  template <typename T, typename... Gens, int... Is>
+  template <typename T, typename... Gens, size_t... Is>
   T generate(std::tuple<Gens...>& gens, size_t size,
-      const detail::range<0, Is...>&)
+      const std::index_sequence<Is...>&)
   {
     return T(std::get<Is>(gens)(size)...);
   }
@@ -32,7 +33,7 @@ namespace autocheck {
   template <typename T, typename... Gens>
   T generate(std::tuple<Gens...>& gens, size_t size) {
     return autocheck::generate<T>(gens, size,
-        detail::range<sizeof...(Gens)>());
+        std::make_index_sequence<sizeof...(Gens)>());
   }
 
   /* Generators produce an infinite sequence. */
