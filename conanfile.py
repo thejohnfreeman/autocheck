@@ -15,7 +15,7 @@ class Autocheck(ConanFile):
     default_options = {'shared': False, 'fPIC': True}
 
     requires = ['cupcake/0.4.1@github/thejohnfreeman']
-    test_requires = ['catch2/3.3.2', 'gtest/1.13.0']
+    test_requires_list = ['catch2/3.3.2', 'gtest/1.13.0']
     generators = ['CMakeDeps', 'CMakeToolchain']
 
     exports_sources = [
@@ -31,7 +31,7 @@ class Autocheck(ConanFile):
     no_copy_source = True
 
     def requirements(self):
-        for requirement in self.test_requires:
+        for requirement in self.test_requires_list:
             self.requires(requirement)
 
     def config_options(self):
