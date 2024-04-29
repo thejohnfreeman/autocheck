@@ -1,5 +1,5 @@
-from conan import ConanFile
-from conan.tools.cmake import CMake
+from conan import ConanFile, conan_version
+from conan.tools.cmake import CMake, cmake_layout
 
 class Autocheck(ConanFile):
     name = 'autocheck'
@@ -14,12 +14,15 @@ class Autocheck(ConanFile):
     options = {'shared': [True, False], 'fPIC': [True, False]}
     default_options = {'shared': False, 'fPIC': True}
 
-    requires = ['cupcake/0.4.1@github/thejohnfreeman']
-    test_requires = ['catch2/3.3.2', 'gtest/1.13.0']
+    requires = [
+        # Available at https://conan.jfreeman.dev
+        'cupcake.cmake/1.0.0@github/thejohnfreeman',
+    ]
     generators = ['CMakeDeps', 'CMakeToolchain']
 
     exports_sources = [
         'CMakeLists.txt',
+        'cupcake.json',
         'cmake/*',
         'external/*',
         'include/*',
@@ -30,9 +33,24 @@ class Autocheck(ConanFile):
     # https://docs.conan.io/en/latest/reference/build_helpers/cmake.html#configure
     no_copy_source = True
 
+    def layout(self):
+        cmake_layout(self)
+
     def requirements(self):
-        for requirement in self.test_requires:
-            self.requires(requirement)
+        import json
+        import pathlib
+        path = pathlib.Path(self.recipe_folder) / 'cupcake.json'
+        with path.open('r') as file:
+            metadata = json.load(file)
+        methods = {
+            'tool': 'tool_requires',
+            'test': 'test_requires',
+        } if conan_version.major.value == 2 else {}
+        for requirement in metadata.get('imports', []):
+            groups = requirement.get('groups', [])
+            group = groups[0] if len(groups) == 1 else 'main'
+            method = methods.get(group, 'requires')
+            getattr(self, method)(requirement['reference'])
 
     def config_options(self):
         if self.settings.os == 'Windows':

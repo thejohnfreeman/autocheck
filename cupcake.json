@@ -1,0 +1,11 @@
+{"libraries": [{"name": "autocheck"}], "imports": [{"name": "gtest", "version": "1.14.0", "reference": "gtest/1.14.0", "file": "GTest", "targets": ["GTest::gtest_main", "GTest::gtest"], "groups": ["test"]}],
+  "tests": [
+      {"name": "arbitrary", "links": ["autocheck.libautocheck", "GTest::gtest_main"]},
+      {"name": "check", "links": ["autocheck.libautocheck", "GTest::gtest_main"]},
+      {"name": "generator_combinators", "links": ["autocheck.libautocheck", "GTest::gtest_main"]},
+      {"name": "generator", "links": ["autocheck.libautocheck", "GTest::gtest_main"]},
+      {"name": "is_one_of", "links": ["autocheck.libautocheck", "GTest::gtest_main"]},
+      {"name": "largest", "links": ["autocheck.libautocheck", "GTest::gtest_main"]},
+      {"name": "value", "links": ["autocheck.libautocheck", "GTest::gtest_main"]}
+  ]
+}
