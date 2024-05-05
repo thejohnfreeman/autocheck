@@ -19,7 +19,7 @@ jobs:
           - '3.29.0'
         conan:
           - 1
-        profile:
+        compiler:
           - gcc
           - clang
         generator:
