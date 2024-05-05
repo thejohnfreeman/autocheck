@@ -35,24 +35,28 @@ jobs:
           - platform: ubuntu
             compiler: gcc
             profile:
+              compiler: gcc
               version: 13
               cc: /usr/bin/gcc-13
               cxx: /usr/bin/g++-13
           - platform: ubuntu
             compiler: clang
             profile:
+              compiler: clang
               version: 15
               cc: /usr/bin/clang-15
               cxx: /usr/bin/clang++-15
           - platform: macos
             compiler: gcc
             profile:
+              compiler: gcc
               version: 13
               cc: /opt/homebrew/bin/gcc-13
               cxx: /opt/homebrew/bin/g++-13
           - platform: macos
             compiler: clang
             profile:
+              compiler: apple-clang
               version: 15
               cc: /usr/bin/clang
               cxx: /usr/bin/clang++
@@ -93,13 +97,16 @@ jobs:
         run: |
           conan profile new default --detect
           conan profile update settings.compiler.cppstd=20 default
-          conan profile update settings.compiler=${{ matrix.compiler }} default
+          conan profile update settings.compiler=${{ matrix.profile.compiler }} default
           conan profile update settings.compiler.version=${{ matrix.profile.version }} default
-          conan profile update settings.compiler.libcxx=libstdc++11 default
           conan profile update env.CC=${{ matrix.profile.cc }} default
           conan profile update env.CXX=${{ matrix.profile.cxx }} default
           conan profile update conf.tools.build:compiler_executables='{"c": "${{ matrix.profile.cc }}", "cpp": "${{ matrix.profile.cxx }}"}' default
           conan remote add github https://conan.jfreeman.dev
+      - name: configure Conan on Linux
+        if: runner.os == 'Linux'
+        run: |
+          conan profile update settings.compiler.libcxx=libstdc++11 default
       - run: cupcake build -G '${{ matrix.generator }}' --flavor ${{ matrix.flavor }} --${{ matrix.linkage }}
       - run: cupcake test
       - run: cupcake install
