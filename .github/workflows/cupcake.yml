@@ -33,6 +33,10 @@ jobs:
           - static
         include:
           - platform: ubuntu
+            runner: ubuntu-22.04
+          - platform: macos
+            runner: macos-14
+          - platform: ubuntu
             compiler: gcc
             profile:
               compiler: gcc
@@ -60,7 +64,7 @@ jobs:
               version: 15
               cc: /usr/bin/clang
               cxx: /usr/bin/clang++
-    runs-on: ${{ matrix.platform }}-latest
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: install Python
         uses: actions/setup-python@v5
@@ -104,7 +108,7 @@ jobs:
           conan profile update conf.tools.build:compiler_executables='{"c": "${{ matrix.profile.cc }}", "cpp": "${{ matrix.profile.cxx }}"}' default
           conan remote add github https://conan.jfreeman.dev
       - name: configure Conan on Linux
-        if: runner.os == 'Linux'
+        if: runner.os == 'Linux' || matrix.compiler == 'gcc'
         run: |
           conan profile update settings.compiler.libcxx=libstdc++11 default
       - run: cupcake build -G '${{ matrix.generator }}' --flavor ${{ matrix.flavor }} --${{ matrix.linkage }}
