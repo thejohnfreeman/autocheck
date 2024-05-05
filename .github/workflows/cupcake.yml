@@ -1,0 +1,81 @@
+name: nix
+on:
+  pull_request:
+  push:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test-install:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - ubuntu
+          - macos
+        cmake:
+          - '3.21.0'
+          - '3.29.0'
+        conan:
+          - 1
+        profile:
+          - gcc
+          - clang
+        generator:
+          - Unix Makefiles
+          - Ninja
+        flavor:
+          - debug
+          - release
+        linkage:
+          - shared
+          - static
+        include:
+          - compiler: gcc
+            profile:
+              version: 13
+              cc: /usr/bin/gcc-13
+              cxx: /usr/bin/g++-13
+          - compiler: clang
+            profile:
+              version: 15
+              cc: /usr/bin/clang-15
+              cxx: /usr/bin/clang++-15
+    runs-on: ${{ matrix.platform }}-latest
+    steps:
+      - name: install Python
+        uses: actions/setup-python@v5
+        with:
+          # The `imp` module is removed in Python 3.12
+          # but required by Conan 1.x.
+          python-version: '3.11'
+      - name: install CMake
+        uses: jwlawson/actions-setup-cmake@v2
+        with:
+          cmake-version: ${{ matrix.cmake }}
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: install Conan
+        run: pip install wheel 'conan~=${{ matrix.conan }}.0' cupcake
+      - name: check environment
+        run: |
+          env | sort
+          echo ${PATH} | tr ':' '\n'
+          python --version
+          conan --version
+          cmake --version
+      - name: configure Conan
+        if: matrix.conan == 1
+        run: |
+          conan profile new default --detect
+          conan profile update settings.compiler.cppstd=20 default
+          conan profile update settings.compiler=${{ matrix.compiler }} default
+          conan profile update settings.compiler.version=${{ matrix.profile.version }} default
+          conan profile update settings.compiler.libcxx=libstdc++11 default
+          conan profile update env.CC=${{ matrix.profile.cc }} default
+          conan profile update env.CXX=${{ matrix.profile.cxx }} default
+          conan profile update conf.tools.build:compiler_executables='{"c": "${{ matrix.profile.cc }}", "cpp": "${{ matrix.profile.cxx }}"}' default
+      - run: cupcake build -G '${{ matrix.generator }}' --flavor ${{ matrix.flavor }} --${{ matrix.linkage }}
+      - run: cupcake test
+      - run: cupcake install
