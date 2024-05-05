@@ -54,6 +54,14 @@ jobs:
         uses: jwlawson/actions-setup-cmake@v2
         with:
           cmake-version: ${{ matrix.cmake }}
+      - name: install Ninja on Linux
+        if: matrix.generator == 'Ninja' && startsWith(matrix.platform, 'ubuntu')
+        shell: bash
+        run: sudo apt install ninja-build
+      - name: install Ninja on OSX
+        if: matrix.generator == 'Ninja' && startsWith(matrix.platform, 'macos')
+        shell: bash
+        run: brew install ninja
       - name: checkout
         uses: actions/checkout@v4
       - name: install Conan
