@@ -32,16 +32,30 @@ jobs:
           - shared
           - static
         include:
-          - compiler: gcc
+          - platform: ubuntu
+            compiler: gcc
             profile:
               version: 13
               cc: /usr/bin/gcc-13
               cxx: /usr/bin/g++-13
-          - compiler: clang
+          - platform: ubuntu
+            compiler: clang
             profile:
               version: 15
               cc: /usr/bin/clang-15
               cxx: /usr/bin/clang++-15
+          - platform: macos
+            compiler: gcc
+            profile:
+              version: 13
+              cc: /opt/homebrew/bin/gcc-13
+              cxx: /opt/homebrew/bin/g++-13
+          - platform: macos
+            compiler: clang
+            profile:
+              version: 15
+              cc: /usr/bin/clang
+              cxx: /usr/bin/clang++
     runs-on: ${{ matrix.platform }}-latest
     steps:
       - name: install Python
@@ -56,12 +70,13 @@ jobs:
           cmake-version: ${{ matrix.cmake }}
       - name: install Ninja on Linux
         if: matrix.generator == 'Ninja' && startsWith(matrix.platform, 'ubuntu')
-        shell: bash
         run: sudo apt install ninja-build
-      - name: install Ninja on OSX
+      - name: install Ninja on macOS
         if: matrix.generator == 'Ninja' && startsWith(matrix.platform, 'macos')
-        shell: bash
         run: brew install ninja
+      - name: install GCC on macOS
+        if: matrix.compiler == 'gcc' && startsWith(matrix.platform, 'macos')
+        run: brew install gcc@13
       - name: checkout
         uses: actions/checkout@v4
       - name: install Conan
