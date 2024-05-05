@@ -111,6 +111,6 @@ jobs:
         if: runner.os == 'Linux' || matrix.compiler == 'gcc'
         run: |
           conan profile update settings.compiler.libcxx=libstdc++11 default
-      - run: cupcake build -G '${{ matrix.generator }}' --flavor ${{ matrix.flavor }} --${{ matrix.linkage }}
-      - run: cupcake test
+      - run: cupcake build --verbose -G '${{ matrix.generator }}' --flavor ${{ matrix.flavor }} --${{ matrix.linkage }}
+      - run: cupcake test --verbose
       - run: cupcake install
