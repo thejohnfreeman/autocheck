@@ -110,7 +110,7 @@ jobs:
       - name: configure Conan on macOS
         if: runner.os == 'macOS'
         run: |
-          conan profile update 'conf.tools.build:exelinkflags=["-Wl,-ld_classic"]'
+          conan profile update 'conf.tools.build:exelinkflags=["-Wl,-ld_classic"]' default
       - name: configure Conan on Linux
         if: runner.os == 'Linux' || matrix.compiler == 'gcc'
         run: |
