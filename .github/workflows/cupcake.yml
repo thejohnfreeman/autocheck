@@ -11,8 +11,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: ubuntu
-        compiler: gcc
+        platform:
+          - ubuntu
+        compiler:
+          - gcc
         id: [1,2,3,4,5]
         include:
           - id: 1
