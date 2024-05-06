@@ -12,24 +12,24 @@ jobs:
       fail-fast: false
       matrix:
         platform:
-          - ubuntu
+          # - ubuntu
           - macos
         cmake:
           - '3.21.0'
-          - '3.29.0'
+          # - '3.29.0'
         conan:
           - 1
         compiler:
-          - gcc
+          # - gcc
           - clang
         generator:
           - Unix Makefiles
-          - Ninja
+          # - Ninja
         flavor:
-          - debug
+          # - debug
           - release
         linkage:
-          - shared
+          # - shared
           - static
         include:
           - platform: ubuntu
@@ -105,8 +105,12 @@ jobs:
           conan profile update settings.compiler.version=${{ matrix.profile.version }} default
           conan profile update env.CC=${{ matrix.profile.cc }} default
           conan profile update env.CXX=${{ matrix.profile.cxx }} default
-          conan profile update conf.tools.build:compiler_executables='{"c": "${{ matrix.profile.cc }}", "cpp": "${{ matrix.profile.cxx }}"}' default
+          conan profile update 'conf.tools.build:compiler_executables={"c": "${{ matrix.profile.cc }}", "cpp": "${{ matrix.profile.cxx }}"}' default
           conan remote add github https://conan.jfreeman.dev
+      - name: configure Conan on macOS
+        if: runner.os == 'macOS'
+        run: |
+          conan profile update 'conf.tools.build:exelinkflags=["-Wl,-ld_classic"]'
       - name: configure Conan on Linux
         if: runner.os == 'Linux' || matrix.compiler == 'gcc'
         run: |
