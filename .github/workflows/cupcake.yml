@@ -15,7 +15,8 @@ jobs:
           - ubuntu
         compiler:
           - gcc
-        id: [1,2,3,4,5]
+          - clang
+        id: [1,2,3,4,5,6,7,8]
         include:
           - id: 1
             cmake: '3.29.0'
@@ -23,30 +24,56 @@ jobs:
             generator: Unix Makefiles
             flavor: release
             linkage: static
+            cppstd: 20
           - id: 2
             cmake: '3.21.0'
             conan: 1
             generator: Unix Makefiles
             flavor: release
             linkage: static
+            cppstd: 20
           - id: 3
             cmake: '3.29.0'
             conan: 1
             generator: Ninja
             flavor: release
             linkage: static
+            cppstd: 20
           - id: 4
             cmake: '3.29.0'
             conan: 1
             generator: Unix Makefiles
             flavor: debug
             linkage: static
+            cppstd: 20
           - id: 5
             cmake: '3.29.0'
             conan: 1
             generator: Unix Makefiles
             flavor: release
             linkage: shared
+            cppstd: 20
+          - id: 6
+            cmake: '3.29.0'
+            conan: 1
+            generator: Unix Makefiles
+            flavor: release
+            linkage: shared
+            cppstd: 17
+          - id: 7
+            cmake: '3.29.0'
+            conan: 1
+            generator: Unix Makefiles
+            flavor: release
+            linkage: shared
+            cppstd: 14
+          - id: 8
+            cmake: '3.29.0'
+            conan: 1
+            generator: Unix Makefiles
+            flavor: release
+            linkage: shared
+            cppstd: 11
           - platform: ubuntu
             runner: ubuntu-22.04
           # - platform: macos
@@ -58,13 +85,13 @@ jobs:
               version: 13
               cc: /usr/bin/gcc-13
               cxx: /usr/bin/g++-13
-          # - platform: ubuntu
-          #   compiler: clang
-          #   profile:
-          #     compiler: clang
-          #     version: 15
-          #     cc: /usr/bin/clang-15
-          #     cxx: /usr/bin/clang++-15
+          - platform: ubuntu
+            compiler: clang
+            profile:
+              compiler: clang
+              version: 15
+              cc: /usr/bin/clang-15
+              cxx: /usr/bin/clang++-15
           # - platform: macos
           #   compiler: gcc
           #   profile:
@@ -115,7 +142,7 @@ jobs:
         if: matrix.conan == 1
         run: |
           conan profile new default --detect
-          conan profile update settings.compiler.cppstd=20 default
+          conan profile update settings.compiler.cppstd=${{ matrix.cppstd }} default
           conan profile update settings.compiler=${{ matrix.profile.compiler }} default
           conan profile update settings.compiler.version=${{ matrix.profile.version }} default
           conan profile update env.CC=${{ matrix.profile.cc }} default
