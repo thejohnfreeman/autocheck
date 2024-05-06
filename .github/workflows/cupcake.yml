@@ -11,38 +11,51 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform:
-          # - ubuntu
-          - macos
-        cmake:
-          - '3.21.0'
-          # - '3.29.0'
-        conan:
-          - 1
-        compiler:
-          # - gcc
-          - clang
-        generator:
-          - Unix Makefiles
-          # - Ninja
-        flavor:
-          # - debug
-          - release
-        linkage:
-          # - shared
-          - static
+        platform: ubuntu
+        compiler: gcc
+        id: [1,2,3,4,5]
         include:
-          # - platform: ubuntu
-          #   runner: ubuntu-22.04
-          - platform: macos
-            runner: macos-14
-          # - platform: ubuntu
-          #   compiler: gcc
-          #   profile:
-          #     compiler: gcc
-          #     version: 13
-          #     cc: /usr/bin/gcc-13
-          #     cxx: /usr/bin/g++-13
+          - id: 1
+            cmake: '3.29.0'
+            conan: 1
+            generator: Unix Makefiles
+            flavor: release
+            linkage: static
+          - id: 2
+            cmake: '3.21.0'
+            conan: 1
+            generator: Unix Makefiles
+            flavor: release
+            linkage: static
+          - id: 3
+            cmake: '3.29.0'
+            conan: 1
+            generator: Ninja
+            flavor: release
+            linkage: static
+          - id: 4
+            cmake: '3.29.0'
+            conan: 1
+            generator: Unix Makefiles
+            flavor: debug
+            linkage: static
+          - id: 5
+            cmake: '3.29.0'
+            conan: 1
+            generator: Unix Makefiles
+            flavor: release
+            linkage: shared
+          - platform: ubuntu
+            runner: ubuntu-22.04
+          # - platform: macos
+          #   runner: macos-14
+          - platform: ubuntu
+            compiler: gcc
+            profile:
+              compiler: gcc
+              version: 13
+              cc: /usr/bin/gcc-13
+              cxx: /usr/bin/g++-13
           # - platform: ubuntu
           #   compiler: clang
           #   profile:
@@ -57,13 +70,13 @@ jobs:
           #     version: 13
           #     cc: /opt/homebrew/bin/gcc-13
           #     cxx: /opt/homebrew/bin/g++-13
-          - platform: macos
-            compiler: clang
-            profile:
-              compiler: apple-clang
-              version: 15
-              cc: /usr/bin/clang
-              cxx: /usr/bin/clang++
+          # - platform: macos
+          #   compiler: clang
+          #   profile:
+          #     compiler: apple-clang
+          #     version: 15
+          #     cc: /usr/bin/clang
+          #     cxx: /usr/bin/clang++
     runs-on: ${{ matrix.runner }}
     steps:
       - name: install Python
