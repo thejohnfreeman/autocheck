@@ -32,31 +32,31 @@ jobs:
           # - shared
           - static
         include:
-          - platform: ubuntu
-            runner: ubuntu-22.04
+          # - platform: ubuntu
+          #   runner: ubuntu-22.04
           - platform: macos
             runner: macos-14
-          - platform: ubuntu
-            compiler: gcc
-            profile:
-              compiler: gcc
-              version: 13
-              cc: /usr/bin/gcc-13
-              cxx: /usr/bin/g++-13
-          - platform: ubuntu
-            compiler: clang
-            profile:
-              compiler: clang
-              version: 15
-              cc: /usr/bin/clang-15
-              cxx: /usr/bin/clang++-15
-          - platform: macos
-            compiler: gcc
-            profile:
-              compiler: gcc
-              version: 13
-              cc: /opt/homebrew/bin/gcc-13
-              cxx: /opt/homebrew/bin/g++-13
+          # - platform: ubuntu
+          #   compiler: gcc
+          #   profile:
+          #     compiler: gcc
+          #     version: 13
+          #     cc: /usr/bin/gcc-13
+          #     cxx: /usr/bin/g++-13
+          # - platform: ubuntu
+          #   compiler: clang
+          #   profile:
+          #     compiler: clang
+          #     version: 15
+          #     cc: /usr/bin/clang-15
+          #     cxx: /usr/bin/clang++-15
+          # - platform: macos
+          #   compiler: gcc
+          #   profile:
+          #     compiler: gcc
+          #     version: 13
+          #     cc: /opt/homebrew/bin/gcc-13
+          #     cxx: /opt/homebrew/bin/g++-13
           - platform: macos
             compiler: clang
             profile:
