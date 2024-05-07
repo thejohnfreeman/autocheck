@@ -16,7 +16,7 @@ jobs:
         compiler:
           - gcc
           - clang
-        id: [1,2,3,4,5,6,7,8]
+        id: [1,2,3,4,5,6]
         include:
           - id: 1
             cmake: '3.29.0'
@@ -60,20 +60,6 @@ jobs:
             flavor: release
             linkage: shared
             cppstd: 17
-          - id: 7
-            cmake: '3.29.0'
-            conan: 1
-            generator: Unix Makefiles
-            flavor: release
-            linkage: shared
-            cppstd: 14
-          - id: 8
-            cmake: '3.29.0'
-            conan: 1
-            generator: Unix Makefiles
-            flavor: release
-            linkage: shared
-            cppstd: 11
           - platform: ubuntu
             runner: ubuntu-22.04
           # - platform: macos
