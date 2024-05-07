@@ -13,6 +13,7 @@ jobs:
       matrix:
         platform:
           - ubuntu
+          - macos
         compiler:
           - gcc
           - clang
@@ -62,8 +63,8 @@ jobs:
             cppstd: 17
           - platform: ubuntu
             runner: ubuntu-22.04
-          # - platform: macos
-          #   runner: macos-14
+          - platform: macos
+            runner: macos-14
           - platform: ubuntu
             compiler: gcc
             profile:
@@ -78,20 +79,20 @@ jobs:
               version: 15
               cc: /usr/bin/clang-15
               cxx: /usr/bin/clang++-15
-          # - platform: macos
-          #   compiler: gcc
-          #   profile:
-          #     compiler: gcc
-          #     version: 13
-          #     cc: /opt/homebrew/bin/gcc-13
-          #     cxx: /opt/homebrew/bin/g++-13
-          # - platform: macos
-          #   compiler: clang
-          #   profile:
-          #     compiler: apple-clang
-          #     version: 15
-          #     cc: /usr/bin/clang
-          #     cxx: /usr/bin/clang++
+          - platform: macos
+            compiler: gcc
+            profile:
+              compiler: gcc
+              version: 13
+              cc: /opt/homebrew/bin/gcc-13
+              cxx: /opt/homebrew/bin/g++-13
+          - platform: macos
+            compiler: clang
+            profile:
+              compiler: apple-clang
+              version: 15
+              cc: /usr/bin/clang
+              cxx: /usr/bin/clang++
     runs-on: ${{ matrix.runner }}
     steps:
       - name: install Python
