@@ -12,10 +12,16 @@ namespace autocheck {
     template <typename Func, typename Gen>
     class mapped_generator {
       public:
+
+
         typedef
-          typename std::result_of<
-            Func(typename Gen::result_type&&, size_t)
-          >::type
+          typename
+#if __cplusplus < 201703L
+          std::result_of<Func(typename Gen::result_type&&, size_t)>
+#else
+          std::invoke_result<Func, typename Gen::result_type&&, size_t>
+#endif
+          ::type
           result_type;
 
       private:

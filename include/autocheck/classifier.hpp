@@ -39,7 +39,11 @@ namespace autocheck {
         typename Func,
         typename Enable = typename std::enable_if<
           !std::is_convertible<
+#if __cplusplus < 201703L
             typename std::result_of<Func(const Args&...)>::type,
+#else
+            typename std::invoke_result<Func, const Args&...>::type,
+#endif
             std::string
           >::value
         >::type
