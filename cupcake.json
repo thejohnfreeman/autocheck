@@ -1,11 +1,108 @@
-{"libraries": [{"name": "autocheck"}], "imports": [{"name": "gtest", "version": "1.14.0", "reference": "gtest/1.14.0", "file": "GTest", "targets": ["GTest::gtest_main", "GTest::gtest"], "groups": ["test"]}],
+{
+  "project": {
+    "name": "autocheck"
+  },
+  "libraries": [
+    {
+      "name": "autocheck"
+    }
+  ],
+  "imports": [
+    {
+      "name": "catch2",
+      "version": "3.6.0",
+      "reference": "catch2/3.6.0",
+      "file": "Catch2",
+      "targets": [
+        "Catch2::Catch2",
+        "Catch2::Catch2WithMain"
+      ],
+      "groups": [
+        "test"
+      ]
+    },
+    {
+      "name": "gtest",
+      "version": "1.14.0",
+      "reference": "gtest/1.14.0",
+      "file": "GTest",
+      "targets": [
+        "GTest::gtest_main",
+        "GTest::gtest"
+      ],
+      "groups": [
+        "test"
+      ]
+    }
+  ],
   "tests": [
-      {"name": "arbitrary", "links": ["autocheck.libautocheck", "GTest::gtest_main"]},
-      {"name": "check", "links": ["autocheck.libautocheck", "GTest::gtest_main"]},
-      {"name": "generator_combinators", "links": ["autocheck.libautocheck", "GTest::gtest_main"]},
-      {"name": "generator", "links": ["autocheck.libautocheck", "GTest::gtest_main"]},
-      {"name": "is_one_of", "links": ["autocheck.libautocheck", "GTest::gtest_main"]},
-      {"name": "largest", "links": ["autocheck.libautocheck", "GTest::gtest_main"]},
-      {"name": "value", "links": ["autocheck.libautocheck", "GTest::gtest_main"]}
+    {
+      "name": "arbitrary",
+      "links": [
+        "autocheck.libautocheck",
+        "GTest::gtest_main"
+      ]
+    },
+    {
+      "name": "check",
+      "links": [
+        "autocheck.libautocheck",
+        "GTest::gtest_main"
+      ]
+    },
+    {
+      "name": "generator_combinators",
+      "links": [
+        "autocheck.libautocheck",
+        "GTest::gtest_main"
+      ]
+    },
+    {
+      "name": "generator",
+      "links": [
+        "autocheck.libautocheck",
+        "GTest::gtest_main"
+      ]
+    },
+    {
+      "name": "is_one_of",
+      "links": [
+        "autocheck.libautocheck",
+        "GTest::gtest_main"
+      ]
+    },
+    {
+      "name": "largest",
+      "links": [
+        "autocheck.libautocheck",
+        "GTest::gtest_main"
+      ]
+    },
+    {
+      "name": "value",
+      "links": [
+        "autocheck.libautocheck",
+        "GTest::gtest_main"
+      ]
+    },
+    {
+      "name": "reverse",
+      "links": [
+        "${PROJECT_NAME}.libautocheck"
+      ]
+    },
+    {
+      "name": "insert-sorted",
+      "links": [
+        "${PROJECT_NAME}.libautocheck"
+      ]
+    },
+    {
+      "name": "factorial",
+      "links": [
+        "${PROJECT_NAME}.libautocheck",
+        "Catch2::Catch2WithMain"
+      ]
+    }
   ]
 }

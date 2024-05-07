@@ -1,11 +1,10 @@
-#define CATCH_CONFIG_MAIN
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 #include <autocheck/sequence.hpp>
 #include <autocheck/check.hpp>
 
 std::size_t Factorial( const std::size_t number ) {
-#define MAKE_IT_FAIL 1
+#define MAKE_IT_FAIL 0
 #if MAKE_IT_FAIL
     return number <= 1 ? number : Factorial(number-1)*number;
 #else
