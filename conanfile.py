@@ -1,11 +1,27 @@
 from conan import ConanFile, conan_version
 from conan.tools.cmake import CMake, cmake_layout
 
+from functools import cached_property
+import json
+import pathlib
+
 class Autocheck(ConanFile):
-    name = 'autocheck'
-    version = '1.0.0'
-    user = 'github'
-    channel = 'thejohnfreeman'
+
+    @cached_property
+    def metadata(self):
+        path = pathlib.Path(self.recipe_folder) / 'cupcake.json'
+        if not path.is_file():
+            path = path.parent.parent / 'export_source' / 'cupcake.json'
+        with open(path, 'r') as file:
+            return json.load(file)
+
+    def set_name(self):
+        if self.name is None:
+            self.name = self.metadata['project']['name']
+
+    def set_version(self):
+        if self.version is None:
+            self.version = self.metadata['project']['version']
 
     license = 'ISC'
     author = 'John Freeman <jfreeman08@gmail.com>'
@@ -16,7 +32,7 @@ class Autocheck(ConanFile):
 
     requires = [
         # Available at https://conan.jfreeman.dev
-        'cupcake.cmake/1.0.0@github/thejohnfreeman',
+        'cupcake.cmake/1.1.1@github/thejohnfreeman',
     ]
     generators = ['CMakeDeps', 'CMakeToolchain']
 
@@ -37,16 +53,11 @@ class Autocheck(ConanFile):
         cmake_layout(self)
 
     def requirements(self):
-        import json
-        import pathlib
-        path = pathlib.Path(self.recipe_folder) / 'cupcake.json'
-        with path.open('r') as file:
-            metadata = json.load(file)
         methods = {
             'tool': 'tool_requires',
             'test': 'test_requires',
         } if conan_version.major.value == 2 else {}
-        for requirement in metadata.get('imports', []):
+        for requirement in self.metadata.get('imports', []):
             groups = requirement.get('groups', [])
             group = groups[0] if len(groups) == 1 else 'main'
             method = methods.get(group, 'requires')

@@ -1,6 +1,7 @@
 {
   "project": {
-    "name": "autocheck"
+    "name": "autocheck",
+    "version": "1.0.0"
   },
   "libraries": [
     {
@@ -39,68 +40,68 @@
     {
       "name": "arbitrary",
       "links": [
-        "autocheck.libautocheck",
+        "autocheck.library",
         "GTest::gtest_main"
       ]
     },
     {
       "name": "check",
       "links": [
-        "autocheck.libautocheck",
+        "autocheck.library",
         "GTest::gtest_main"
       ]
     },
     {
       "name": "generator_combinators",
       "links": [
-        "autocheck.libautocheck",
+        "autocheck.library",
         "GTest::gtest_main"
       ]
     },
     {
       "name": "generator",
       "links": [
-        "autocheck.libautocheck",
+        "autocheck.library",
         "GTest::gtest_main"
       ]
     },
     {
       "name": "is_one_of",
       "links": [
-        "autocheck.libautocheck",
+        "autocheck.library",
         "GTest::gtest_main"
       ]
     },
     {
       "name": "largest",
       "links": [
-        "autocheck.libautocheck",
+        "autocheck.library",
         "GTest::gtest_main"
       ]
     },
     {
       "name": "value",
       "links": [
-        "autocheck.libautocheck",
+        "autocheck.library",
         "GTest::gtest_main"
       ]
     },
     {
       "name": "reverse",
       "links": [
-        "${PROJECT_NAME}.libautocheck"
+        "${PROJECT_NAME}.library"
       ]
     },
     {
       "name": "insert-sorted",
       "links": [
-        "${PROJECT_NAME}.libautocheck"
+        "${PROJECT_NAME}.library"
       ]
     },
     {
       "name": "factorial",
       "links": [
-        "${PROJECT_NAME}.libautocheck",
+        "${PROJECT_NAME}.library",
         "Catch2::Catch2WithMain"
       ]
     }
