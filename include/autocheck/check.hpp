@@ -8,6 +8,7 @@
 #include <autocheck/tuple.hpp>
 
 #include <sstream>
+#include <tuple>
 
 namespace autocheck {
 

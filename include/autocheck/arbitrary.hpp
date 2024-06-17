@@ -7,6 +7,7 @@
 
 #include <cassert>
 #include <cstdio>
+#include <tuple>
 
 namespace autocheck {
 

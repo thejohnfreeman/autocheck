@@ -5,6 +5,7 @@
 #include <autocheck/function.hpp>
 
 #include <sstream>
+#include <tuple>
 #include <unordered_map>
 
 namespace autocheck {
