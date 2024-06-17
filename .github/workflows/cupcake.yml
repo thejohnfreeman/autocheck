@@ -117,7 +117,7 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
       - name: install Conan
-        run: pip install wheel 'conan~=${{ matrix.conan }}.0' cupcake
+        run: pipx install 'conan~=${{ matrix.conan }}.0' cupcake
       - name: check environment
         run: |
           env | sort
@@ -125,6 +125,7 @@ jobs:
           python --version
           conan --version
           cmake --version
+          cupcake --version
       - name: configure Conan
         if: matrix.conan == 1
         run: |
