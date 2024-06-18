@@ -2,6 +2,7 @@ name: nix
 on:
   pull_request:
   push:
+    branches:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -62,7 +63,7 @@ jobs:
             linkage: shared
             cppstd: 17
           - platform: ubuntu
-            runner: ubuntu-22.04
+            runner: ubuntu-24.04
           - platform: macos
             runner: macos-14
           - platform: ubuntu
@@ -76,16 +77,16 @@ jobs:
             compiler: clang
             profile:
               compiler: clang
-              version: 15
-              cc: /usr/bin/clang-15
-              cxx: /usr/bin/clang++-15
+              version: 16
+              cc: /usr/bin/clang-16
+              cxx: /usr/bin/clang++-16
           - platform: macos
             compiler: gcc
             profile:
               compiler: gcc
               version: 13
-              cc: /opt/homebrew/bin/gcc-13
-              cxx: /opt/homebrew/bin/g++-13
+              cc: gcc-13
+              cxx: g++-13
           - platform: macos
             compiler: clang
             profile:
@@ -111,12 +112,6 @@ jobs:
       - name: install Ninja on macOS
         if: matrix.generator == 'Ninja' && startsWith(matrix.platform, 'macos')
         run: brew install ninja
-      - name: install GCC on Linux
-        if: matrix.compiler == 'gcc' && startsWith(matrix.platform, 'ubuntu')
-        run: sudo apt install gcc-13
-      - name: install GCC on macOS
-        if: matrix.compiler == 'gcc' && startsWith(matrix.platform, 'macos')
-        run: brew install gcc@13
       - name: check compiler
         run: |
           ${{ matrix.profile.cc }} --version
