@@ -2,7 +2,7 @@ name: nix
 on:
   pull_request:
   push:
-    branches:
+    branches: '**'
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
