@@ -23,8 +23,8 @@ class Autocheck(ConanFile):
         if self.version is None:
             self.version = self.metadata['project']['version']
 
-    default_user = 'github'
-    default_channel = 'thejohnfreeman'
+    user = 'github'
+    channel = 'thejohnfreeman'
 
     license = 'ISC'
     author = 'John Freeman <jfreeman08@gmail.com>'
