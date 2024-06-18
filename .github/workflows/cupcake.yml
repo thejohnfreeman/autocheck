@@ -111,9 +111,16 @@ jobs:
       - name: install Ninja on macOS
         if: matrix.generator == 'Ninja' && startsWith(matrix.platform, 'macos')
         run: brew install ninja
+      - name: install GCC on Linux
+        if: matrix.compiler == 'gcc' && startsWith(matrix.platform, 'ubuntu')
+        run: sudo apt install gcc-13
       - name: install GCC on macOS
         if: matrix.compiler == 'gcc' && startsWith(matrix.platform, 'macos')
         run: brew install gcc@13
+      - name: check compiler
+        run: |
+          ${{ matrix.profile.cc }} --version
+          ${{ matrix.profile.cxx }} --version
       - name: checkout
         uses: actions/checkout@v4
       - name: install Conan
